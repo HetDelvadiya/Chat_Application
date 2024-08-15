@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <style name="CustomSearchView" parent="Widget.AppCompat.SearchView">
+        <!-- Customize search view here -->
+        <item name="android:queryBackground">@color/md_theme_inversePrimary</item>
+        <item name="android:closeIcon">@drawable/custom_close_icon</item>
+        <item name="android:queryHint">Search here...</item>
+        <item name="android:textColorHint">@color/md_theme_onSecondaryContainer</item>
+        <item name="android:textColor">@color/md_theme_onSecondaryContainer</item>
+
+    </style>
+
+    <style name="CircleImage" parent="">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">50%</item>
+    </style>
+
+</resources>

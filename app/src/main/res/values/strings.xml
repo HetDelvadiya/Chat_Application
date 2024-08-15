@@ -1,0 +1,14 @@
+<resources>
+    <string name="app_name">Chat Application</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="verification_text">Enter the verification code sent to your phone</string>
+    <string name="verifying_your_number">Verifying Your Number</string>
+    <string name="enter_otp">Enter OTP</string>
+    <string name="verify">Verify</string>
+    <string name="phone_number">Phone Number</string>
+    <string name="code">+    </string>
+    <string name="phonenumber_text">We will send ans SMS message to verify your phone number</string>
+    <string name="enter_number">Enter Your Phone number</string>
+    <string name="request_text">You may request a new code in </string>
+</resources>
