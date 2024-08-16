@@ -12,7 +12,7 @@ import com.google.firebase.auth.PhoneAuthProvider
 import kotlinx.coroutines.launch
 
 
-class AuthViewMode(val repository: AuthRepository) :ViewModel() {
+class AuthViewModel(val repository: AuthRepository) :ViewModel() {
 
     private val _verificationId = MutableLiveData<String>()
 

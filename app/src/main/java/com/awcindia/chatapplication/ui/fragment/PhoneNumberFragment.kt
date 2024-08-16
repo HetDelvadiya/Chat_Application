@@ -14,13 +14,13 @@ import com.awcindia.chatapplication.ViewModelFactory.AuthViewModelFactory
 import com.awcindia.chatapplication.databinding.FragmentPhoneNumberBinding
 import com.awcindia.chatapplication.repository.AuthRepository
 import com.awcindia.chatapplication.ui.viewmodel.AuthState
-import com.awcindia.chatapplication.ui.viewmodel.AuthViewMode
+import com.awcindia.chatapplication.ui.viewmodel.AuthViewModel
 import com.google.firebase.auth.FirebaseAuth
 
 class PhoneNumberFragment : Fragment() {
 
     private lateinit var binding: FragmentPhoneNumberBinding
-    private lateinit var viewModel: AuthViewMode
+    private lateinit var viewModel: AuthViewModel
 
 
     override fun onCreateView(
@@ -34,7 +34,7 @@ class PhoneNumberFragment : Fragment() {
 
 
         viewModel =
-            ViewModelProvider(this, AuthViewModelFactory(repository))[AuthViewMode::class.java]
+            ViewModelProvider(this, AuthViewModelFactory(repository))[AuthViewModel::class.java]
 
         binding.progressbar.visibility = View.INVISIBLE
 
@@ -74,7 +74,11 @@ class PhoneNumberFragment : Fragment() {
 
                     binding.progressbar.visibility = View.GONE
                     val navController = findNavController()
-                    navController.navigate(R.id.action_phoneNumberFragment_to_verificationFragment)
+                    val bundle = Bundle()
+                    bundle.putString("verificationId", viewModel.verificationId.value)
+                    Log.d("verificationId", viewModel.verificationId.value.toString())
+
+                    navController.navigate(R.id.action_phoneNumberFragment_to_verificationFragment , bundle)
                 }
 
                 is AuthState.CodeSent -> {
