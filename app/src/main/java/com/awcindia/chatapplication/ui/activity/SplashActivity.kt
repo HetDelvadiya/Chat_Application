@@ -4,11 +4,9 @@ package com.awcindia.chatapplication.ui.activity
 import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Bundle
-import android.os.Handler
 import android.text.Spannable
 import android.text.SpannableString
 import android.text.style.ForegroundColorSpan
-import android.widget.TextView
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
@@ -26,7 +24,7 @@ import kotlinx.coroutines.launch
 @SuppressLint("CustomSplashScreen")
 class SplashActivity : AppCompatActivity() {
 
-    lateinit var binding : ActivitySplashBinding
+    lateinit var binding: ActivitySplashBinding
     private val auth = FirebaseAuth.getInstance()
 
 
@@ -83,7 +81,7 @@ class SplashActivity : AppCompatActivity() {
         )
 
         var start = 0
-        colorArray.forEachIndexed { _ , colorId ->
+        colorArray.forEachIndexed { _, colorId ->
             val color = resources.getColor(colorId)
             spannableString.setSpan(
                 ForegroundColorSpan(color),
