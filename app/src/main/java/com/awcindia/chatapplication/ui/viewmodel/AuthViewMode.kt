@@ -21,7 +21,6 @@ class AuthViewMode(val repository: AuthRepository) :ViewModel() {
     private val _authState = MutableLiveData<AuthState>()
     val authState: LiveData<AuthState> get() = _authState
 
-
     fun sendVerificationCode(phoneNumber: String){
 
         viewModelScope.launch {

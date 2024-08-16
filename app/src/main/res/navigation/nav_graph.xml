@@ -9,7 +9,7 @@
         android:id="@+id/phoneNumberFragment"
         android:name="com.awcindia.chatapplication.ui.fragment.PhoneNumberFragment"
         android:label="phone_number"
-        tools:layout="@layout/fragment_phone_number" >
+        tools:layout="@layout/fragment_phone_number">
         <action
             android:id="@+id/action_phoneNumberFragment_to_verificationFragment"
             app:destination="@id/verificationFragment" />
@@ -18,10 +18,14 @@
         android:id="@+id/verificationFragment"
         android:name="com.awcindia.chatapplication.ui.fragment.VerificationFragment"
         android:label="verification"
-        tools:layout="@layout/fragment_verification" >
+        tools:layout="@layout/fragment_verification">
         <action
             android:id="@+id/action_verificationFragment_to_setProfileFragment"
             app:destination="@id/setProfileFragment" />
+
+        <argument
+            android:name="verificationId"
+            app:argType="string" />
     </fragment>
     <activity
         android:id="@+id/mainActivity"
@@ -32,7 +36,7 @@
         android:id="@+id/termAndConditionFragment"
         android:name="com.awcindia.chatapplication.ui.fragment.TermAndConditionFragment"
         android:label="fragment_term_and_condition"
-        tools:layout="@layout/fragment_term_and_condition" >
+        tools:layout="@layout/fragment_term_and_condition">
         <action
             android:id="@+id/action_termAndConditionFragment_to_phoneNumberFragment"
             app:destination="@id/phoneNumberFragment" />
@@ -41,7 +45,7 @@
         android:id="@+id/setProfileFragment"
         android:name="com.awcindia.chatapplication.ui.fragment.SetProfileFragment"
         android:label="fragment_set_profile"
-        tools:layout="@layout/fragment_set_profile" >
+        tools:layout="@layout/fragment_set_profile">
         <action
             android:id="@+id/action_setProfileFragment_to_mainActivity"
             app:destination="@id/mainActivity" />

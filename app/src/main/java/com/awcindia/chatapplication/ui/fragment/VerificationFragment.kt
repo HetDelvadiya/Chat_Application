@@ -7,15 +7,15 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import com.awcindia.chatapplication.R
+import com.awcindia.chatapplication.ViewModelFactory.VerificationFactory
 import com.awcindia.chatapplication.databinding.FragmentVerificationBinding
+import com.awcindia.chatapplication.repository.AuthStates
+import com.awcindia.chatapplication.repository.VerificationRepository
+import com.awcindia.chatapplication.ui.viewmodel.VerificationViewModel
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.PhoneAuthCredential
-import com.google.firebase.auth.PhoneAuthProvider
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.tasks.await
 
 
 class VerificationFragment : Fragment() {
@@ -24,6 +24,7 @@ class VerificationFragment : Fragment() {
     private lateinit var binding: FragmentVerificationBinding
 
     private lateinit var auth: FirebaseAuth
+    private lateinit var viewModel: VerificationViewModel
     private var verificationId: String? = null
 
     override fun onCreateView(
@@ -31,12 +32,27 @@ class VerificationFragment : Fragment() {
         savedInstanceState: Bundle?,
     ): View {
 
+
         binding = FragmentVerificationBinding.inflate(inflater, container, false)
 
         auth = FirebaseAuth.getInstance()
+        val repository = VerificationRepository(auth)
+        val id = arguments?.getString("verificationId")
+        verificationId = id
+        Log.d("verificationId", verificationId.toString())
+
+        viewModel = ViewModelProvider(
+            this,
+            VerificationFactory(repository)
+        )[VerificationViewModel::class.java]
+
+
         binding.progressbar.visibility = View.INVISIBLE
 
-        verificationId = arguments?.getString("verificationId")
+        viewModel.authState.observe(viewLifecycleOwner) { authState ->
+            handleAuthState(authState)
+        }
+
 
         binding.verify.setOnClickListener {
             val code = binding.verificationCode.text.toString()
@@ -50,49 +66,36 @@ class VerificationFragment : Fragment() {
                 return@setOnClickListener
             }
 
-            lifecycleScope.launch {
-                try {
-                    verificationId?.let { id ->
-                        verifyCode(id, code)
-                    }
-                } catch (e: Exception) {
-                    Toast.makeText(
-                        requireContext(),
-                        "Verification failed: ${e.message}",
-                        Toast.LENGTH_LONG
-                    ).show()
-                }
+            verificationId?.let {
+                viewModel.verifyCode(it, code)
             }
         }
 
         return binding.root
     }
 
-    private suspend fun verifyCode(verificationId: String, code: String) {
-        val credential = PhoneAuthProvider.getCredential(verificationId, code)
-        binding.progressbar.visibility = View.VISIBLE
-        signInWithPhoneAuthCredential(credential)
-    }
+    private fun handleAuthState(authState: AuthStates) {
+        when (authState) {
 
-    private suspend fun signInWithPhoneAuthCredential(credential: PhoneAuthCredential) {
-        try {
-            val task = auth.signInWithCredential(credential).await()
-            if (task.user != null) {
+            is AuthStates.Loading -> {
+                binding.progressbar.visibility = View.VISIBLE
+            }
+
+            is AuthStates.Authenticated -> {
+                binding.progressbar.visibility = View.GONE
                 Toast.makeText(requireContext(), "Authentication successful!", Toast.LENGTH_LONG)
                     .show()
                 findNavController().navigate(R.id.action_verificationFragment_to_setProfileFragment)
-            } else {
-                throw Exception("Authentication failed")
             }
-        } catch (e: Exception) {
-            Log.w("PhoneAuth", "signInWithCredential:failure", e)
-            Toast.makeText(
-                requireContext(),
-                "Authentication failed: ${e.message}",
-                Toast.LENGTH_LONG
-            ).show()
-        } finally {
-            binding.progressbar.visibility = View.GONE
+
+            is AuthStates.Error -> {
+                binding.progressbar.visibility = View.GONE
+                Toast.makeText(
+                    requireContext(),
+                    "Authentication failed: ${authState.message}",
+                    Toast.LENGTH_LONG
+                ).show()
+            }
         }
     }
 }

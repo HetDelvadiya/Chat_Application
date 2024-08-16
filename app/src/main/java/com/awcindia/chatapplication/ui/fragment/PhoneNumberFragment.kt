@@ -1,12 +1,12 @@
 package com.awcindia.chatapplication.ui.fragment
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import com.awcindia.chatapplication.R
@@ -64,9 +64,7 @@ class PhoneNumberFragment : Fragment() {
 
     private fun observeViewModel() {
 
-        viewModel.authState.observe(viewLifecycleOwner, Observer {
-
-                state ->
+        viewModel.authState.observe(viewLifecycleOwner) { state ->
 
             when (state) {
 
@@ -83,7 +81,11 @@ class PhoneNumberFragment : Fragment() {
                     binding.progressbar.visibility = View.GONE
                     val bundle = Bundle()
                     bundle.putString("verificationId", viewModel.verificationId.value)
-                    findNavController().navigate(R.id.action_phoneNumberFragment_to_verificationFragment)
+                    Log.d("verificationId", viewModel.verificationId.value.toString())
+                    findNavController().navigate(
+                        R.id.action_phoneNumberFragment_to_verificationFragment,
+                        bundle
+                    )
                 }
 
                 is AuthState.Failure -> {
@@ -95,6 +97,6 @@ class PhoneNumberFragment : Fragment() {
                     ).show()
                 }
             }
-        })
+        }
     }
 }
