@@ -1,6 +1,7 @@
 package com.awcindia.chatapplication.ui.viewmodel
 
 
+import android.app.Activity
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -12,7 +13,7 @@ import com.google.firebase.auth.PhoneAuthProvider
 import kotlinx.coroutines.launch
 
 
-class AuthViewModel(val repository: AuthRepository) :ViewModel() {
+class AuthViewModel(val repository: AuthRepository) : ViewModel() {
 
     private val _verificationId = MutableLiveData<String>()
 
@@ -21,7 +22,7 @@ class AuthViewModel(val repository: AuthRepository) :ViewModel() {
     private val _authState = MutableLiveData<AuthState>()
     val authState: LiveData<AuthState> get() = _authState
 
-    fun sendVerificationCode(phoneNumber: String){
+    fun sendVerificationCode(phoneNumber: String, activity: Activity) {
 
         viewModelScope.launch {
 
@@ -29,34 +30,40 @@ class AuthViewModel(val repository: AuthRepository) :ViewModel() {
 
                 _authState.value = AuthState.Loading
 
-                repository.sendVerificationCode(phoneNumber , object : PhoneAuthProvider.OnVerificationStateChangedCallbacks(){
-                    override fun onVerificationCompleted(p0: PhoneAuthCredential) {
+                repository.sendVerificationCode(
+                    phoneNumber,
+                    object : PhoneAuthProvider.OnVerificationStateChangedCallbacks() {
+                        override fun onVerificationCompleted(p0: PhoneAuthCredential) {
 
-                       launch {
-                           repository.signInWithPhoneAuthCredential(p0)
-                           _authState.value = AuthState.Success
+                            launch {
+                                repository.signInWithPhoneAuthCredential(p0)
+                                _authState.value = AuthState.Success
+                            }
                         }
-                    }
 
-                    override fun onVerificationFailed(p0: FirebaseException) {
-                        _authState.value = AuthState.Failure(p0.message.toString())
-                    }
+                        override fun onVerificationFailed(p0: FirebaseException) {
+                            _authState.value = AuthState.Failure(p0.message.toString())
+                        }
 
-                    override fun onCodeSent(p0: String, p1: PhoneAuthProvider.ForceResendingToken) {
-                        super.onCodeSent(p0, p1)
-                        _verificationId.value = p0
-                        _authState.value = AuthState.CodeSent
-                    }
+                        override fun onCodeSent(
+                            p0: String,
+                            p1: PhoneAuthProvider.ForceResendingToken,
+                        ) {
+                            super.onCodeSent(p0, p1)
+                            _verificationId.value = p0
+                            _authState.value = AuthState.CodeSent
+                        }
 
-                })
-            }catch (e : Exception){
+                    },
+                    activity)
+            } catch (e: Exception) {
                 _authState.value = AuthState.Failure(e.message.toString())
             }
         }
     }
 }
 
-sealed class AuthState{
+sealed class AuthState {
 
     data object Loading : AuthState()
     data object Success : AuthState()

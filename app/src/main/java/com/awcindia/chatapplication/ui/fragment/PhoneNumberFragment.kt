@@ -54,7 +54,7 @@ class PhoneNumberFragment : Fragment() {
 
             val fullPhoneNumber = "+$countryCode$phoneNumber"
 
-            viewModel.sendVerificationCode(fullPhoneNumber)
+            viewModel.sendVerificationCode(fullPhoneNumber, requireActivity())
         }
 
         observeViewModel()
@@ -78,7 +78,10 @@ class PhoneNumberFragment : Fragment() {
                     bundle.putString("verificationId", viewModel.verificationId.value)
                     Log.d("verificationId", viewModel.verificationId.value.toString())
 
-                    navController.navigate(R.id.action_phoneNumberFragment_to_verificationFragment , bundle)
+                    navController.navigate(
+                        R.id.action_phoneNumberFragment_to_verificationFragment,
+                        bundle
+                    )
                 }
 
                 is AuthState.CodeSent -> {

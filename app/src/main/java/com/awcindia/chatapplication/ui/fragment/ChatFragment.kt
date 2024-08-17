@@ -15,10 +15,9 @@ class ChatFragment : Fragment() {
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?,
-    ): View? {
+    ): View {
 
         binding = FragmentChatBinding.inflate(inflater, container, false)
-
 
 
         return binding.root

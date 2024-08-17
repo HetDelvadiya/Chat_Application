@@ -83,8 +83,6 @@ class VerificationFragment : Fragment() {
 
             is AuthStates.Authenticated -> {
                 binding.progressbar.visibility = View.GONE
-                Toast.makeText(requireContext(), "Authentication successful!", Toast.LENGTH_LONG)
-                    .show()
                 findNavController().navigate(R.id.action_verificationFragment_to_setProfileFragment)
             }
 
