@@ -31,5 +31,10 @@ class AuthActivity : AppCompatActivity() {
 
         val navController = navHostFragment.navController
 
+        val navigateToSetProfile = intent.getBooleanExtra("navigate_to_set_profile", false)
+        if (navigateToSetProfile) {
+            navController.navigate(R.id.action_termAndConditionFragment_to_setProfileFragment)
+        }
+
     }
 }

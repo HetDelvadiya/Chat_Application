@@ -7,20 +7,20 @@
     android:layout_height="match_parent"
     tools:context=".ui.activity.PersonsChatActivity">
 
-
     <androidx.appcompat.widget.Toolbar
         android:id="@+id/toolbar2"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        app:layout_constraintBottom_toTopOf="@+id/guideline1"
-        app:layout_constraintEnd_toStartOf="@+id/guideline4"
-        app:layout_constraintStart_toStartOf="@+id/guideline3"
-        app:layout_constraintTop_toTopOf="@+id/guideline">
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/md_theme_primaryContainer_highContrast"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="wrap_content">
 
+            <!-- Profile Image -->
             <com.google.android.material.imageview.ShapeableImageView
                 android:id="@+id/profile_image"
                 android:layout_width="50dp"
@@ -40,6 +40,7 @@
                 android:layout_marginStart="4dp"
                 android:text="Contact Name"
                 android:textSize="20sp"
+                android:textColor="@color/md_theme_onSecondary"
                 android:textStyle="bold"
                 app:layout_constraintBottom_toBottomOf="@+id/profile_image"
                 app:layout_constraintStart_toEndOf="@+id/profile_image"
@@ -52,6 +53,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="8dp"
                 android:text="Online"
+                android:textColor="@color/md_theme_onSecondary"
                 android:textSize="14sp"
                 app:layout_constraintStart_toEndOf="@+id/profile_image"
                 app:layout_constraintTop_toBottomOf="@+id/contact_name" />
@@ -63,11 +65,12 @@
     <!-- RecyclerView for Chat Messages -->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recycler_gchat"
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="0dp"
-        android:layout_marginBottom="8dp"
+        app:layout_constraintTop_toBottomOf="@+id/toolbar2"
         app:layout_constraintBottom_toTopOf="@+id/layout_gchat_chatbox"
-        app:layout_constraintTop_toBottomOf="@+id/toolbar2"/>
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
 
     <!-- Chatbox Layout -->
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -86,12 +89,12 @@
             app:shapeAppearanceOverlay="@style/CircleImage"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"/>
+            app:layout_constraintTop_toTopOf="parent" />
 
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/edit_gchat_message"
             android:layout_width="0dp"
-            android:layout_height="0dp"
+            android:layout_height="wrap_content"
             android:background="@android:color/transparent"
             android:hint="Enter message"
             android:inputType="text"
@@ -108,41 +111,11 @@
             android:layout_height="40dp"
             app:icon="@drawable/send"
             app:iconGravity="top"
-            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             tools:ignore="ImageContrastCheck" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
-
-
-    <androidx.constraintlayout.widget.Guideline
-        android:id="@+id/guideline3"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        app:layout_constraintGuide_percent="0.01" />
-
-    <androidx.constraintlayout.widget.Guideline
-        android:id="@+id/guideline4"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        app:layout_constraintGuide_percent="0.99" />
-
-    <androidx.constraintlayout.widget.Guideline
-        android:id="@+id/guideline"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        app:layout_constraintGuide_percent="0.01" />
-
-    <androidx.constraintlayout.widget.Guideline
-        android:id="@+id/guideline1"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        app:layout_constraintGuide_percent="0.11" />
-
 
 </androidx.constraintlayout.widget.ConstraintLayout>

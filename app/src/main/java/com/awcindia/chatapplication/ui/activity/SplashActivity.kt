@@ -14,10 +14,13 @@ import androidx.core.view.WindowInsetsCompat
 import com.awcindia.chatapplication.R
 import com.awcindia.chatapplication.databinding.ActivitySplashBinding
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.tasks.await
+import kotlinx.coroutines.withContext
 
 
 @Suppress("SameParameterValue")
@@ -25,7 +28,7 @@ import kotlinx.coroutines.launch
 class SplashActivity : AppCompatActivity() {
 
     lateinit var binding: ActivitySplashBinding
-    private val auth = FirebaseAuth.getInstance()
+    private var auth = FirebaseAuth.getInstance()
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -39,18 +42,36 @@ class SplashActivity : AppCompatActivity() {
             insets
         }
 
-        // Use a coroutine to delay for 2 seconds
+
         CoroutineScope(Dispatchers.Main).launch {
             delay(2000) // 2000 milliseconds (2 seconds) delay
 
             val currentUser = auth.currentUser
-            val intent = if (currentUser != null) {
-                Intent(this@SplashActivity, MainActivity::class.java)
+            if (currentUser != null) {
+                // Fetch user profile data from Firestore
+                val firestore = FirebaseFirestore.getInstance()
+                val documentSnapshot = withContext(Dispatchers.IO) {
+                    firestore.collection("users").document(currentUser.uid).get().await()
+                }
+
+                val userName = documentSnapshot.getString("userName") ?: ""
+
+                // Check if the profile is filled
+                val intent = if (userName.isNotEmpty()) {
+                    Intent(this@SplashActivity, MainActivity::class.java)
+                } else {
+                    Intent(this@SplashActivity, AuthActivity::class.java).apply {
+                        putExtra("navigate_to_set_profile", true)
+                    }
+                }
+
+                startActivity(intent)
             } else {
-                Intent(this@SplashActivity, AuthActivity::class.java)
+                // User not authenticated, go to AuthActivity
+                val intent = Intent(this@SplashActivity, AuthActivity::class.java)
+                startActivity(intent)
             }
 
-            startActivity(intent)
             finish() // Close SplashActivity so it won't remain in the back stack
         }
 

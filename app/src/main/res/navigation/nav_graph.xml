@@ -40,6 +40,9 @@
         <action
             android:id="@+id/action_termAndConditionFragment_to_phoneNumberFragment"
             app:destination="@id/phoneNumberFragment" />
+        <action
+            android:id="@+id/action_termAndConditionFragment_to_setProfileFragment"
+            app:destination="@id/setProfileFragment" />
     </fragment>
     <fragment
         android:id="@+id/setProfileFragment"

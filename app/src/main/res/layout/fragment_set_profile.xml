@@ -33,6 +33,7 @@
         android:layout_height="wrap_content"
         android:hint="Enter user name"
         android:textSize="18sp"
+        android:maxLength="15"
         android:layout_marginStart="8dp"
         android:layout_marginEnd="26dp"
         android:textStyle="bold"
