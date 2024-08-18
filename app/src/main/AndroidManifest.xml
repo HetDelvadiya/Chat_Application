@@ -32,7 +32,7 @@
         </activity>
 
         <activity
-            android:name=".ui.activity.PersonsChatActivity"
+            android:name=".ui.activity.MessageChatActivity"
             android:exported="true"
             android:theme="@style/AppTheme"
             android:windowSoftInputMode="adjustResize" />

@@ -90,7 +90,7 @@
 
     <TextClock
         android:id="@+id/textClock"
-        android:layout_width="0dp"
+        android:layout_width="wrap_content"
         android:layout_height="0dp"
         android:textAlignment="center"
         app:layout_constraintBottom_toTopOf="@+id/guideline14"
