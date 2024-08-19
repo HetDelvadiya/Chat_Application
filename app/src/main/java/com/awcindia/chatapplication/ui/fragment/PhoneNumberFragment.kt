@@ -12,6 +12,7 @@ import androidx.navigation.fragment.findNavController
 import com.awcindia.chatapplication.R
 import com.awcindia.chatapplication.ViewModelFactory.AuthViewModelFactory
 import com.awcindia.chatapplication.databinding.FragmentPhoneNumberBinding
+import com.awcindia.chatapplication.model.UserPhoneNumber
 import com.awcindia.chatapplication.repository.AuthRepository
 import com.awcindia.chatapplication.ui.viewmodel.AuthState
 import com.awcindia.chatapplication.ui.viewmodel.AuthViewModel
@@ -42,6 +43,8 @@ class PhoneNumberFragment : Fragment() {
         binding.next.setOnClickListener {
             val countryCode = binding.countryCode.text.toString()
             val phoneNumber = binding.phoneNumber.text.toString()
+
+            UserPhoneNumber.phoneNumber = phoneNumber
 
             if (countryCode.isEmpty() || phoneNumber.isEmpty()) {
                 Toast.makeText(

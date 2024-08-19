@@ -7,6 +7,7 @@
         android:name="android.permission.READ_EXTERNAL_STORAGE"
         android:maxSdkVersion="32" />
     <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />
+    <uses-permission android:name="android.permission.READ_CONTACTS" />
 
     <application
         android:allowBackup="true"
@@ -19,40 +20,31 @@
         android:theme="@style/AppTheme"
         tools:targetApi="31">
         <activity
+            android:name=".ui.activity.ContactActivity"
+            android:exported="false" />
+        <activity
             android:name=".ui.activity.SplashActivity"
             android:exported="true"
             android:theme="@style/AppTheme">
-
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-
         </activity>
-
         <activity
             android:name=".ui.activity.MessageChatActivity"
             android:exported="true"
             android:theme="@style/AppTheme"
             android:windowSoftInputMode="adjustResize" />
-
         <activity
             android:name=".ui.activity.AuthActivity"
             android:exported="true"
             android:theme="@style/AppTheme" />
-
-
         <activity
             android:name=".ui.activity.MainActivity"
             android:exported="true"
-            android:theme="@style/AppTheme">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.DEFAULT" />
-            </intent-filter>
-        </activity>
+            android:theme="@style/AppTheme"></activity>
     </application>
 
 </manifest>

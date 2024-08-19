@@ -5,6 +5,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.awcindia.chatapplication.model.User
+import com.awcindia.chatapplication.model.UserPhoneNumber
 import com.awcindia.chatapplication.repository.SetProfileRepository
 import com.google.firebase.auth.FirebaseAuth
 import java.util.UUID
@@ -28,7 +29,7 @@ class SetProfitViewModel(
         _uploadState.value = UploadState.Loading
 
         repository.uploadImage(imageRef, userImage).addOnSuccessListener { downloadUri ->
-            val user = User(userID, userName, downloadUri.toString())
+            val user = User(userID, userName, downloadUri.toString() , UserPhoneNumber.phoneNumber)
             repository.saveUserProfile(user).addOnCompleteListener {
                 _uploadState.value = UploadState.Success
             }.addOnFailureListener { e ->

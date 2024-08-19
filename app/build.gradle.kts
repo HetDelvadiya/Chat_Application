@@ -49,6 +49,7 @@ dependencies {
     implementation ("androidx.browser:browser:1.2.0")
 
     implementation ("com.github.bumptech.glide:glide:4.16.0")
+    implementation(libs.androidx.media3.common)
     kapt("com.github.bumptech.glide:compiler:4.15.1")
     //Coroutines
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3")
