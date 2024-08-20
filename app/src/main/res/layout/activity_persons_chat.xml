@@ -7,14 +7,22 @@
     android:layout_height="match_parent"
     tools:context=".ui.activity.MessageChatActivity">
 
+    <ProgressBar
+        android:id="@+id/progressBar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/toolbar2" />
+
     <androidx.appcompat.widget.Toolbar
         android:id="@+id/toolbar2"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@color/md_theme_primaryContainer_highContrast"
-        app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent">
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
@@ -39,8 +47,8 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="4dp"
                 android:text="Contact Name"
-                android:textSize="20sp"
                 android:textColor="@color/md_theme_onSecondary"
+                android:textSize="20sp"
                 android:textStyle="bold"
                 app:layout_constraintBottom_toBottomOf="@+id/profile_image"
                 app:layout_constraintStart_toEndOf="@+id/profile_image"
@@ -48,11 +56,10 @@
 
             <!-- Status Message -->
             <TextView
-                android:id="@+id/status_message"
+                android:id="@+id/statusIndicatore"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="8dp"
-                android:text="Online"
                 android:textColor="@color/md_theme_onSecondary"
                 android:textSize="14sp"
                 app:layout_constraintStart_toEndOf="@+id/profile_image"
@@ -67,20 +74,20 @@
         android:id="@+id/recycler_gchat"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        app:layout_constraintTop_toBottomOf="@+id/toolbar2"
         app:layout_constraintBottom_toTopOf="@+id/layout_gchat_chatbox"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+        app:layout_constraintTop_toBottomOf="@+id/toolbar2" />
 
-<!--    <androidx.recyclerview.widget.RecyclerView-->
-<!--        android:id="@+id/senderRecyclerView"-->
-<!--        android:layout_width="0dp"-->
-<!--        android:layout_height="0dp"-->
-<!--        app:layout_constraintTop_toBottomOf="@+id/toolbar2"-->
-<!--        app:layout_constraintBottom_toTopOf="@+id/layout_gchat_chatbox"-->
-<!--        app:layout_constraintStart_toStartOf="parent"-->
-<!--        app:layout_constraintEnd_toEndOf="parent" />-->
-<!--    -->
+    <!--    <androidx.recyclerview.widget.RecyclerView-->
+    <!--        android:id="@+id/senderRecyclerView"-->
+    <!--        android:layout_width="0dp"-->
+    <!--        android:layout_height="0dp"-->
+    <!--        app:layout_constraintTop_toBottomOf="@+id/toolbar2"-->
+    <!--        app:layout_constraintBottom_toTopOf="@+id/layout_gchat_chatbox"-->
+    <!--        app:layout_constraintStart_toStartOf="parent"-->
+    <!--        app:layout_constraintEnd_toEndOf="parent" />-->
+    <!--    -->
 
     <!-- Chatbox Layout -->
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -96,10 +103,10 @@
             android:layout_height="40dp"
             app:icon="@drawable/emoji"
             app:iconGravity="top"
-            app:shapeAppearanceOverlay="@style/CircleImage"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toTopOf="parent"
+            app:shapeAppearanceOverlay="@style/CircleImage" />
 
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/edit_gchat_message"
@@ -107,7 +114,7 @@
             android:layout_height="wrap_content"
             android:background="@android:color/transparent"
             android:hint="Enter message"
-            android:inputType="textMultiLine"
+            android:inputType="textMultiLine|textCapSentences"
             android:maxLines="6"
             android:padding="8dp"
             app:layout_constraintBottom_toBottomOf="parent"

@@ -46,4 +46,37 @@ class MassageRepository(val firestore: FirebaseFirestore) {
             Log.e("sendMessage", "Error sending message: ${e.message}")
         }
     }
+
+
+    fun updateTypingStatus(currentUserId: String, isTyping: Boolean) {
+        firestore.collection("users").document(currentUserId).update("typing", isTyping)
+            .addOnSuccessListener {
+                Log.d("UserTyping", "Typing status updated to $isTyping")
+            }
+            .addOnFailureListener { e ->
+                Log.e("UserTyping", "Error updating typing status: ${e.message}")
+            }
+    }
+
+
+        fun getUserTypingStatus(receiverId: String): LiveData<Boolean> {
+        val typingLiveData = MutableLiveData<Boolean>()
+
+        firestore.collection("users").document(receiverId)
+            .addSnapshotListener { snapshot, e ->
+                if (e != null) {
+                    Log.w("UserTyping", "Listen failed.", e)
+                    return@addSnapshotListener
+                }
+
+                if (snapshot != null && snapshot.exists()) {
+                    val isTyping = snapshot.getBoolean("typing") ?: false
+                    typingLiveData.postValue(isTyping)
+                } else {
+                    typingLiveData.postValue(false)
+                }
+            }
+        return typingLiveData
+    }
+
 }

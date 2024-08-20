@@ -1,10 +1,13 @@
 package com.awcindia.chatapplication.ui.activity
 
 import android.os.Bundle
+import android.view.View
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.core.widget.addTextChangedListener
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -33,7 +36,7 @@ class MessageChatActivity : AppCompatActivity() {
     private lateinit var receiverViewModel: ReceiverViewModel
 
     private val firestore = FirebaseFirestore.getInstance()
-
+    val repository = MassageRepository(firestore)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -54,6 +57,8 @@ class MessageChatActivity : AppCompatActivity() {
             insets
         }
 
+        binding.progressBar.visibility = View.VISIBLE
+
         val receiverUID = intent.getStringExtra("userId").toString()
         val userName = intent.getStringExtra("userName")
         val userImage = intent.getStringExtra("userImage")
@@ -62,30 +67,52 @@ class MessageChatActivity : AppCompatActivity() {
         senderRoom = currentUserId + receiverUID
         receiverRoom = receiverUID + currentUserId
 
-        messageAdapter =
-            MessageAdapter(this, messageList)
+
+        messageAdapter = MessageAdapter(this, messageList)
         binding.recyclerGchat.layoutManager = LinearLayoutManager(this@MessageChatActivity)
         binding.recyclerGchat.adapter = messageAdapter
 
         binding.contactName.text = userName
 
-        Glide.with(this)
-            .load(userImage)
-            .placeholder(R.drawable.default_dp)
-            .error(R.drawable.default_dp)
-            .into(binding.profileImage)
+        Glide.with(this).load(userImage).placeholder(R.drawable.default_dp)
+            .error(R.drawable.default_dp).into(binding.profileImage)
 
 
-        val repository = MassageRepository(firestore)
         senderViewModel =
             ViewModelProvider(this, MessageFactory(repository))[SenderViewModel::class.java]
         receiverViewModel =
             ViewModelProvider(this, MessageFactory(repository))[ReceiverViewModel::class.java]
 
 
+        // Observe user status and typing status
+        val combinedStatus = MutableLiveData<String>()
+
+        val statusObserver = Observer<String> { status ->
+            val typingStatus = if (combinedStatus.value?.contains("Typing...") == true) {
+                "Typing..."
+            } else {
+                ""
+            }
+            binding.statusIndicatore.text = when (status) {
+                "online" -> "${typingStatus}"
+                else -> "${typingStatus}"
+            }
+        }
+
+        repository.getUserTypingStatus(receiverUID).observe(this) { isTyping ->
+            val currentStatus = combinedStatus.value ?: ""
+            combinedStatus.value = if (isTyping) {
+                if (currentStatus.contains("Typing...")) currentStatus else "$currentStatus Typing..."
+            } else {
+                currentStatus.replace("Typing...", "").trim()
+            }
+            statusObserver.onChanged(combinedStatus.value ?: "")
+        }
+
         receiverViewModel.receiveMassage(senderRoom)
 
         receiverViewModel.messages.observe(this, Observer { messages ->
+            binding.progressBar.visibility = View.INVISIBLE
             messageList.clear()
             messageList.addAll(messages)
             messageAdapter.notifyDataSetChanged()
@@ -100,7 +127,8 @@ class MessageChatActivity : AppCompatActivity() {
                     massageId = firestore.collection("messages").document().id,
                     massage = messageText,
                     senderId = currentUserId,
-                    timestamp = System.currentTimeMillis()
+                    timestamp = System.currentTimeMillis(),
+                    userStatus = "Typing..."
                 )
 
                 senderViewModel.sendMessage(senderRoom, receiverRoom, message)
@@ -111,5 +139,16 @@ class MessageChatActivity : AppCompatActivity() {
                 binding.recyclerGchat.scrollToPosition(messageList.size - 1)
             }
         }
+
+        // Set typing status on text change
+        binding.editGchatMessage.addTextChangedListener {
+            repository.updateTypingStatus(currentUserId, it.toString().isNotEmpty())
+        }
+    }
+
+    // Remove typing status when the activity is destroyed
+    override fun onDestroy() {
+        super.onDestroy()
+        repository.updateTypingStatus(currentUserId, false)
     }
 }

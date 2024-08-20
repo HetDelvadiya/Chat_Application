@@ -7,5 +7,6 @@ data class MessageData(
     val massage  : String = "" ,
     val senderId  : String = "" ,
     val timestamp: Long   = 0 ,
+    val userStatus : String = ""
 ) {
 }
