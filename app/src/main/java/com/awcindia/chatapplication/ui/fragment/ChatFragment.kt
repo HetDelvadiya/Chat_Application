@@ -20,14 +20,16 @@ import com.awcindia.chatapplication.ui.viewmodel.ContactViewModel
 import com.awcindia.chatapplication.utils.ContactsManager
 import com.google.firebase.firestore.FirebaseFirestore
 
+
 class ChatFragment : Fragment() {
 
     lateinit var binding: FragmentChatBinding
-    private var deviceContacts: List<Contact> = arrayListOf()
+    private var deviceContact: List<Contact> = arrayListOf()
     private lateinit var contactsManager: ContactsManager
     private lateinit var contactAdapter: ChatListAdapter
     private lateinit var viewModel: ContactViewModel
     private val firestore = FirebaseFirestore.getInstance()
+
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -35,20 +37,23 @@ class ChatFragment : Fragment() {
     ): View {
 
         binding = FragmentChatBinding.inflate(inflater, container, false)
+
         contactsManager = ContactsManager(requireContext())
 
         if (isContactsPermissionGranted()) {
+
             binding.progressbar.visibility = View.VISIBLE
-            deviceContacts = contactsManager.getContacts()
-           // Log.d("contacts", deviceContacts.toString())
+            deviceContact = contactsManager.getContacts()
+            Log.d("list", deviceContact.toString())
         } else {
             requestContactsPermission()
         }
 
-        Log.d("phoneNumbers", deviceContacts.toString())
+        Log.d("list", deviceContact.toString())
         contactAdapter = ChatListAdapter()
         binding.chatRecyclerview.layoutManager = LinearLayoutManager(requireContext())
         binding.chatRecyclerview.adapter = contactAdapter
+
 
         val repository = ContactRepository(firestore)
         viewModel = ViewModelProvider(
@@ -56,19 +61,26 @@ class ChatFragment : Fragment() {
             ContactViewModelFactory(repository)
         )[ContactViewModel::class.java]
 
-        viewModel.getAllUser(deviceContacts).observe(viewLifecycleOwner) { userList ->
-          contactAdapter.submitList(userList)
+
+        viewModel.getAllUser(deviceContact).observe(viewLifecycleOwner) { userList ->
+
             binding.progressbar.visibility = View.INVISIBLE
+            contactAdapter.submitList(userList.distinct())
+
         }
 
         return binding.root
     }
+
     private fun isContactsPermissionGranted(): Boolean {
         return ContextCompat.checkSelfPermission(
             requireContext(),
             android.Manifest.permission.READ_CONTACTS
         ) == PackageManager.PERMISSION_GRANTED
     }
+
+    private val REQUEST_READ_CONTACTS = 1
+
     private fun requestContactsPermission() {
         if (ActivityCompat.shouldShowRequestPermissionRationale(
                 requireActivity(),
@@ -86,6 +98,7 @@ class ChatFragment : Fragment() {
             )
         }
     }
+
     override fun onRequestPermissionsResult(
         requestCode: Int,
         permissions: Array<out String>,
@@ -95,14 +108,10 @@ class ChatFragment : Fragment() {
         if (requestCode == REQUEST_READ_CONTACTS) {
             if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 // Permission granted, proceed with accessing contacts
-                deviceContacts = contactsManager.getContacts()
-                // Optionally, refresh the UI or data here
+                deviceContact = contactsManager.getContacts()
             } else {
-                requestContactsPermission()
+                // Permission denied, handle accordingly
             }
         }
-    }
-    companion object {
-        private const val REQUEST_READ_CONTACTS = 1
     }
 }
