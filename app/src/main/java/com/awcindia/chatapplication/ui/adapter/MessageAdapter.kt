@@ -60,6 +60,8 @@ class MessageAdapter(
                             .load(message.imageUrl)
                             .into(binding.messageImage)
                     }
+
+                    binding.seenIndicatore.text = if (message.seenByReceiver) "seen" else "sent"
                 }
 
                 is ItemMessageReceivedBinding -> {
