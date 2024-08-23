@@ -77,11 +77,13 @@ class MessageChatActivity : AppCompatActivity() {
             }
         }
 
-
-        // Observe typing status
-        messageViewModel.getTypingStatus(chatId).observe(this) { typingStatus ->
-            updateTypingIndicator(typingStatus)
+// Observe user typing status
+        repository.getUserTypingStatus(receiverId).observe(this) { isTyping ->
+            // Update status indicator based on typing status
+            val currentStatus = if (isTyping) "Typing..." else "Online"
+            binding.typingIndicator.text = currentStatus
         }
+
 
 
         binding.sendText.setOnClickListener {
@@ -106,19 +108,11 @@ class MessageChatActivity : AppCompatActivity() {
         binding.editGchatMessage.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-                messageViewModel.setTypingStatus(chatId, currentUserId, s.isNullOrEmpty().not())
+                repository.updateTypingStatus(chatId , true)
             }
             override fun afterTextChanged(s: Editable?) {}
         })
     }
-
-
-    private fun updateTypingIndicator(typingStatus: Map<String, Boolean>?) {
-        val isTyping = typingStatus?.get(receiverId) == true
-        // Show typing indicator based on `isTyping`
-        binding.typingIndicator.visibility = if (isTyping) View.VISIBLE else View.GONE
-    }
-
     private fun setupInsets() {
         ViewCompat.setOnApplyWindowInsetsListener(binding.main) { v, insets ->
             val systemBarsInsets = insets.getInsets(WindowInsetsCompat.Type.systemBars())

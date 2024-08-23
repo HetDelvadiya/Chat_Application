@@ -17,11 +17,11 @@ class MessageViewModel(private val repository: MassageRepository) : ViewModel() 
         repository.sendMessage(chatId, message)
     }
 
-    fun setTypingStatus(chatId: String, userId: String, isTyping: Boolean) {
-        repository.setTypingStatus(chatId, userId, isTyping)
-    }
-
-    fun getTypingStatus(chatId: String): LiveData<Map<String, Boolean>> {
-        return repository.getTypingStatus(chatId)
-    }
+//    fun setTypingStatus(chatId: String, userId: String, isTyping: Boolean) {
+//        repository.setTypingStatus(chatId, userId, isTyping)
+//    }
+//
+//    fun getTypingStatus(chatId: String): LiveData<Map<String, Boolean>> {
+//        return repository.getTypingStatus(chatId)
+//    }
 }
