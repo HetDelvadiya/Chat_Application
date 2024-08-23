@@ -1,14 +1,14 @@
 package com.awcindia.chatapplication.ui.activity
 
+
 import android.os.Bundle
+import android.text.Editable
+import android.text.TextWatcher
 import android.view.View
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
-import androidx.core.widget.addTextChangedListener
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.awcindia.chatapplication.R
@@ -17,8 +17,7 @@ import com.awcindia.chatapplication.databinding.ActivityPersonsChatBinding
 import com.awcindia.chatapplication.model.MessageData
 import com.awcindia.chatapplication.repository.MassageRepository
 import com.awcindia.chatapplication.ui.adapter.MessageAdapter
-import com.awcindia.chatapplication.ui.viewmodel.ReceiverViewModel
-import com.awcindia.chatapplication.ui.viewmodel.SenderViewModel
+import com.awcindia.chatapplication.ui.viewmodel.MessageViewModel
 import com.bumptech.glide.Glide
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
@@ -26,129 +25,120 @@ import com.google.firebase.firestore.FirebaseFirestore
 class MessageChatActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityPersonsChatBinding
+    private lateinit var messageViewModel: MessageViewModel
+
+    private lateinit var chatId: String
     private lateinit var messageAdapter: MessageAdapter
-    private lateinit var senderRoom: String
-    private lateinit var receiverRoom: String
-    private lateinit var currentUserId: String
-    private val messageList: ArrayList<MessageData> = ArrayList()
-
-    private lateinit var senderViewModel: SenderViewModel
-    private lateinit var receiverViewModel: ReceiverViewModel
-
     private val firestore = FirebaseFirestore.getInstance()
-    val repository = MassageRepository(firestore)
+    private val repository = MassageRepository()
+    private val currentUserId = FirebaseAuth.getInstance().currentUser?.uid.toString()
+    private var receiverId: String = ""
+
+    override fun onStart() {
+        super.onStart()
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         binding = ActivityPersonsChatBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        ViewCompat.setOnApplyWindowInsetsListener(binding.main) { v, insets ->
-            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-            val systemBarsInsets = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-            val imeInsets = insets.getInsets(WindowInsetsCompat.Type.ime())
-            val navigationBarHeight = systemBarsInsets.bottom
-            // Adjust padding based on keyboard visibility
-            v.setPadding(
-                systemBars.left,
-                systemBars.top,
-                systemBars.right,
-                imeInsets.bottom + navigationBarHeight
-            )
-            insets
-        }
 
-        binding.progressBar.visibility = View.VISIBLE
+        setupInsets()
 
-        val receiverUID = intent.getStringExtra("userId").toString()
+        binding.progressBar.visibility = View.INVISIBLE
+        messageViewModel =
+            ViewModelProvider(this, MessageFactory(repository)).get(MessageViewModel::class.java)
+
+
+        receiverId = intent.getStringExtra("userId").orEmpty()
         val userName = intent.getStringExtra("userName")
         val userImage = intent.getStringExtra("userImage")
 
-        currentUserId = FirebaseAuth.getInstance().currentUser?.uid.toString()
-        senderRoom = currentUserId + receiverUID
-        receiverRoom = receiverUID + currentUserId
-
-
-        messageAdapter = MessageAdapter(this, messageList)
-        binding.recyclerGchat.layoutManager = LinearLayoutManager(this@MessageChatActivity)
-        binding.recyclerGchat.adapter = messageAdapter
+        chatId = generateChatId(currentUserId, receiverId)
 
         binding.contactName.text = userName
+        Glide.with(this)
+            .load(userImage)
+            .placeholder(R.drawable.default_dp)
+            .error(R.drawable.default_dp)
+            .into(binding.profileImage)
 
-        Glide.with(this).load(userImage).placeholder(R.drawable.default_dp)
-            .error(R.drawable.default_dp).into(binding.profileImage)
+        messageAdapter = MessageAdapter(this, currentUserId)
+        binding.recyclerGchat.adapter = messageAdapter
+        binding.recyclerGchat.layoutManager = LinearLayoutManager(this)
 
 
-        senderViewModel =
-            ViewModelProvider(this, MessageFactory(repository))[SenderViewModel::class.java]
-        receiverViewModel =
-            ViewModelProvider(this, MessageFactory(repository))[ReceiverViewModel::class.java]
 
-
-        // Observe user status and typing status
-        val combinedStatus = MutableLiveData<String>()
-
-        val statusObserver = Observer<String> { status ->
-            val typingStatus = if (combinedStatus.value?.contains("Typing...") == true) {
-                "Typing..."
-            } else {
-                ""
-            }
-            binding.statusIndicatore.text = when (status) {
-                "online" -> "${typingStatus}"
-                else -> "${typingStatus}"
+        messageViewModel.getMessages(chatId).observe(this) { messages ->
+            messages?.let {
+                messageAdapter.submitList(it)
+                binding.recyclerGchat.scrollToPosition(it.size - 1)
             }
         }
 
-        repository.getUserTypingStatus(receiverUID).observe(this) { isTyping ->
-            val currentStatus = combinedStatus.value ?: ""
-            combinedStatus.value = if (isTyping) {
-                if (currentStatus.contains("Typing...")) currentStatus else "$currentStatus Typing..."
-            } else {
-                currentStatus.replace("Typing...", "").trim()
-            }
-            statusObserver.onChanged(combinedStatus.value ?: "")
+
+        // Observe typing status
+        messageViewModel.getTypingStatus(chatId).observe(this) { typingStatus ->
+            updateTypingIndicator(typingStatus)
         }
-
-        receiverViewModel.receiveMassage(senderRoom)
-
-        receiverViewModel.messages.observe(this, Observer { messages ->
-            binding.progressBar.visibility = View.INVISIBLE
-            messageList.clear()
-            messageList.addAll(messages)
-            messageAdapter.notifyDataSetChanged()
-            binding.recyclerGchat.scrollToPosition(messageList.size - 1)
-        })
 
 
         binding.sendText.setOnClickListener {
             val messageText = binding.editGchatMessage.text.toString().trim()
             if (messageText.isNotEmpty()) {
                 val message = MessageData(
-                    massageId = firestore.collection("messages").document().id,
-                    massage = messageText,
+                    message = messageText,
                     senderId = currentUserId,
+                    receiverId = receiverId,
                     timestamp = System.currentTimeMillis(),
-                    userStatus = "Typing..."
+                    messageType = "text",
+                    imageUrl = null,
+                    seenByReceiver = false
                 )
-
-                senderViewModel.sendMessage(senderRoom, receiverRoom, message)
-                // Immediately add the message to the adapter
-                messageList.add(message)
-                messageAdapter.notifyItemInserted(messageList.size - 1)
+                messageViewModel.sendMessage(chatId, message)
+//                binding.recyclerGchat.scrollToPosition()
                 binding.editGchatMessage.text?.clear()
-                binding.recyclerGchat.scrollToPosition(messageList.size - 1)
             }
         }
 
-        // Set typing status on text change
-        binding.editGchatMessage.addTextChangedListener {
-            repository.updateTypingStatus(currentUserId, it.toString().isNotEmpty())
+        // Set typing status when user types
+        binding.editGchatMessage.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                messageViewModel.setTypingStatus(chatId, currentUserId, s.isNullOrEmpty().not())
+            }
+            override fun afterTextChanged(s: Editable?) {}
+        })
+    }
+
+
+    private fun updateTypingIndicator(typingStatus: Map<String, Boolean>?) {
+        val isTyping = typingStatus?.get(receiverId) == true
+        // Show typing indicator based on `isTyping`
+        binding.typingIndicator.visibility = if (isTyping) View.VISIBLE else View.GONE
+    }
+
+    private fun setupInsets() {
+        ViewCompat.setOnApplyWindowInsetsListener(binding.main) { v, insets ->
+            val systemBarsInsets = insets.getInsets(WindowInsetsCompat.Type.systemBars())
+            val imeInsets = insets.getInsets(WindowInsetsCompat.Type.ime())
+            v.setPadding(
+                systemBarsInsets.left,
+                systemBarsInsets.top,
+                systemBarsInsets.right,
+                imeInsets.bottom + systemBarsInsets.bottom
+            )
+            insets
         }
     }
 
-    // Remove typing status when the activity is destroyed
-    override fun onDestroy() {
-        super.onDestroy()
-        repository.updateTypingStatus(currentUserId, false)
+    private fun generateChatId(userId1: String, userId2: String): String {
+        return if (userId1 < userId2) {
+            "$userId1-$userId2"
+        } else {
+            "$userId2-$userId1"
+        }
     }
+
 }

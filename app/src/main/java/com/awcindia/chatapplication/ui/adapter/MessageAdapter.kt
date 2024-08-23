@@ -1,67 +1,97 @@
 package com.awcindia.chatapplication.ui.adapter
 
 import android.content.Context
-import android.view.Gravity
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
+import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import com.awcindia.chatapplication.databinding.ItemMessageChatBinding
+import androidx.viewbinding.ViewBinding
+import com.awcindia.chatapplication.databinding.ItemMessageReceivedBinding
+import com.awcindia.chatapplication.databinding.ItemMessageSentBinding
 import com.awcindia.chatapplication.model.MessageData
-import com.google.firebase.auth.FirebaseAuth
+import com.bumptech.glide.Glide
 import java.text.SimpleDateFormat
+import java.util.Date
 import java.util.Locale
 
-class MessageAdapter(val context: Context, private val messages: ArrayList<MessageData>) :
-    RecyclerView.Adapter<MessageAdapter.MessageHolder>() {
+class MessageAdapter(
+    private val context: Context,
+    private val currentUserId: String,
+) : ListAdapter<MessageData, MessageAdapter.MessageViewHolder>(MessageDiffCallback()) {
 
-    private val currentUserId = FirebaseAuth.getInstance().currentUser?.uid.toString()
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MessageHolder {
-        val binding =
-            ItemMessageChatBinding.inflate(LayoutInflater.from(parent.context), parent, false)
-        return MessageHolder(binding)
+    private val VIEW_TYPE_SENT = 1
+    private val VIEW_TYPE_RECEIVED = 2
+
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MessageViewHolder {
+        val binding = if (viewType == VIEW_TYPE_SENT) {
+            ItemMessageSentBinding.inflate(LayoutInflater.from(context), parent, false)
+        } else {
+            ItemMessageReceivedBinding.inflate(LayoutInflater.from(context), parent, false)
+        }
+        return MessageViewHolder(binding)
     }
 
-    override fun getItemCount(): Int {
-        return messages.size
-    }
-
-    override fun onBindViewHolder(holder: MessageHolder, position: Int) {
-        val message = messages[position]
+    override fun onBindViewHolder(holder: MessageViewHolder, position: Int) {
+        val message = getItem(position) // Use getItem to retrieve the current item
         holder.bind(message)
     }
 
-
-    inner class MessageHolder(val binding: ItemMessageChatBinding) :
-        RecyclerView.ViewHolder(binding.root) {
-        fun bind(message: MessageData) {
-
-
-            // Set message text and timestamp
-            binding.textMessage.text = message.massage
-            binding.textTimestamp.text = formatTimestamp(message.timestamp)
-
-//            // Set background color based on message sender
-//            val isSentMessage = message.senderId == currentUserId
-//            val backgroundColor = if (isSentMessage) {
-//                R.color.color_part1
-//            } else {
-//                R.color.color_part3
-//            }
-//            binding.back.setBackgroundColor(ContextCompat.getColor(context, backgroundColor))
-
-            // Set gravity based on message sender
-            val isSentMessage = message.senderId == currentUserId
-            val gravity = if (isSentMessage) {
-                Gravity.END
-            } else {
-                Gravity.START
-            }
-            binding.root.gravity = gravity
+    override fun getItemViewType(position: Int): Int {
+        return if (getItem(position).senderId == currentUserId) {
+            VIEW_TYPE_SENT
+        } else {
+            VIEW_TYPE_RECEIVED
         }
     }
 
-    private fun formatTimestamp(timestamp: Long): String {
-        val sdf = SimpleDateFormat("hh:mm a", Locale.getDefault())
-        return sdf.format(timestamp)
+    inner class MessageViewHolder(val binding: ViewBinding) :
+        RecyclerView.ViewHolder(binding.root) {
+
+        fun bind(message: MessageData) {
+            when (binding) {
+                is ItemMessageSentBinding -> {
+                    binding.messageText.text = message.message
+                    binding.messageImage.visibility =
+                        if (message.messageType == "text") View.GONE else View.VISIBLE
+                    if (message.messageType != "text") {
+                        Glide.with(context)
+                            .load(message.imageUrl)
+                            .into(binding.messageImage)
+                    }
+                }
+
+                is ItemMessageReceivedBinding -> {
+                    binding.messageText.text = message.message
+                    binding.messageImage.visibility =
+                        if (message.messageType == "text") View.GONE else View.VISIBLE
+                    if (message.messageType != "text") {
+                        Glide.with(context)
+                            .load(message.imageUrl)
+                            .into(binding.messageImage)
+                    }
+                }
+            }
+
+            // Format and display the timestamp
+            val timestamp = message.timestamp
+            val formattedTime =
+                SimpleDateFormat("hh:mm a", Locale.getDefault()).format(Date(timestamp))
+            when (binding) {
+                is ItemMessageSentBinding -> binding.messageTimestamp.text = formattedTime
+                is ItemMessageReceivedBinding -> binding.messageTimestamp.text = formattedTime
+            }
+        }
+    }
+    class MessageDiffCallback : DiffUtil.ItemCallback<MessageData>() {
+
+        override fun areItemsTheSame(oldItem: MessageData, newItem: MessageData): Boolean {
+            return oldItem.messageId == newItem.messageId
+        }
+
+        override fun areContentsTheSame(oldItem: MessageData, newItem: MessageData): Boolean {
+            return oldItem == newItem
+        }
     }
 }

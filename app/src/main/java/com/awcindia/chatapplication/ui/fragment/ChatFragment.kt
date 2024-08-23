@@ -9,6 +9,7 @@ import android.view.ViewGroup
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.awcindia.chatapplication.ViewModelFactory.ContactViewModelFactory
@@ -66,7 +67,6 @@ class ChatFragment : Fragment() {
 
             binding.progressbar.visibility = View.INVISIBLE
             contactAdapter.submitList(userList.distinct())
-
         }
 
         return binding.root

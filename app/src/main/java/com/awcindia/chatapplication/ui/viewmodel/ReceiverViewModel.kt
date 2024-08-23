@@ -8,12 +8,7 @@ import com.awcindia.chatapplication.repository.MassageRepository
 
 class ReceiverViewModel(val repository: MassageRepository) : ViewModel() {
 
-    private val _messages = MutableLiveData<List<MessageData>>()
-    val messages: LiveData<List<MessageData>> get() = _messages
 
-    fun receiveMassage(senderRoom: String) {
-        repository.receiveMessage(senderRoom).observeForever { messages ->
-            _messages.postValue(messages)
-        }
-    }
+
+
 }

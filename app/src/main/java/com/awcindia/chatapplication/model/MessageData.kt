@@ -3,10 +3,13 @@ package com.awcindia.chatapplication.model
 import com.google.firebase.Timestamp
 
 data class MessageData(
-    val massageId  : String = "" ,
-    val massage  : String = "" ,
-    val senderId  : String = "" ,
-    val timestamp: Long   = 0 ,
-    val userStatus : String = ""
+    val messageId: String = "",
+    val message: String = "",
+    val senderId: String = "",
+    val receiverId: String = "",
+    val timestamp: Long = 0L,
+    val messageType: String = "",
+    val imageUrl: String? = null,
+    val seenByReceiver: Boolean = false
 ) {
 }

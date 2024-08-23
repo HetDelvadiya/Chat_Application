@@ -1,82 +1,67 @@
 package com.awcindia.chatapplication.repository
 
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.awcindia.chatapplication.model.MessageData
+import com.awcindia.chatapplication.model.TypingStatus
 import com.google.firebase.firestore.FirebaseFirestore
-import kotlinx.coroutines.tasks.await
 
-class MassageRepository(val firestore: FirebaseFirestore) {
-    fun receiveMessage(senderRoom: String): LiveData<List<MessageData>> {
+class MassageRepository() {
+    private val firestore = FirebaseFirestore.getInstance()
+
+    fun sendMessage(chatId: String, message: MessageData) {
+        val messageDoc = firestore.collection("chats")
+            .document(chatId)
+            .collection("messages")
+            .document()
+
+        val messageWithId = message.copy(messageId = messageDoc.id)
+        messageDoc.set(messageWithId)
+    }
+
+    fun getMessages(chatId: String): LiveData<List<MessageData>> {
         val messagesLiveData = MutableLiveData<List<MessageData>>()
 
-        firestore.collection("messages")
-            .document(senderRoom)
-            .collection("chats")
+        firestore.collection("chats")
+            .document(chatId)
+            .collection("messages")
             .orderBy("timestamp")
-            .addSnapshotListener { snapshot, e ->
-                if (e != null) {
-                    Log.w("ChatRepository", "Listen failed.", e)
-                    return@addSnapshotListener
+            .addSnapshotListener { snapshot, _ ->
+                val messages = snapshot?.documents?.mapNotNull { document ->
+                    document.toObject(MessageData::class.java)
                 }
-
-                if (snapshot != null && !snapshot.isEmpty) {
-                    val messagesList = snapshot.toObjects(MessageData::class.java)
-                    messagesLiveData.postValue(messagesList)
-                }
+                messagesLiveData.value = messages!!
             }
 
         return messagesLiveData
     }
 
-    suspend fun sendMessage(senderRoom: String, receiverRoom: String, messageData: MessageData) {
+    fun setTypingStatus(chatId: String, userId: String, isTyping: Boolean) {
+        val typingStatusRef = firestore.collection("chats")
+            .document(chatId)
+            .collection("typingStatus")
+            .document(userId)
 
-        try {
-            // Add message to sender's room
-            firestore.collection("messages").document(senderRoom)
-                .collection("chats").add(messageData).await()
+        val status = mapOf(
+            "isTyping" to isTyping,
+            "timestamp" to System.currentTimeMillis()
+        )
 
-            // Add message to receiver's room
-            firestore.collection("messages").document(receiverRoom)
-                .collection("chats").add(messageData).await()
-
-        } catch (e: Exception) {
-            // Handle the exception
-            Log.e("sendMessage", "Error sending message: ${e.message}")
-        }
+        typingStatusRef.set(status)
     }
 
-
-    fun updateTypingStatus(currentUserId: String, isTyping: Boolean) {
-        firestore.collection("users").document(currentUserId).update("typing", isTyping)
-            .addOnSuccessListener {
-                Log.d("UserTyping", "Typing status updated to $isTyping")
-            }
-            .addOnFailureListener { e ->
-                Log.e("UserTyping", "Error updating typing status: ${e.message}")
-            }
-    }
-
-
-        fun getUserTypingStatus(receiverId: String): LiveData<Boolean> {
-        val typingLiveData = MutableLiveData<Boolean>()
-
-        firestore.collection("users").document(receiverId)
-            .addSnapshotListener { snapshot, e ->
-                if (e != null) {
-                    Log.w("UserTyping", "Listen failed.", e)
-                    return@addSnapshotListener
+    fun getTypingStatus(chatId: String): LiveData<Map<String, Boolean>> {
+        val liveData = MutableLiveData<Map<String, Boolean>>()
+        firestore.collection("chats")
+            .document(chatId)
+            .collection("typingStatus")
+            .addSnapshotListener { snapshot, _ ->
+                val typingStatus = snapshot?.documents?.associate { doc ->
+                    doc.id to (doc.getBoolean("isTyping") ?: false)
                 }
-
-                if (snapshot != null && snapshot.exists()) {
-                    val isTyping = snapshot.getBoolean("typing") ?: false
-                    typingLiveData.postValue(isTyping)
-                } else {
-                    typingLiveData.postValue(false)
-                }
+                liveData.value = typingStatus!!
             }
-        return typingLiveData
+        return liveData
     }
-
 }
+
