@@ -1,5 +1,6 @@
 package com.awcindia.chatapplication.repository
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.awcindia.chatapplication.model.MessageData
@@ -36,32 +37,34 @@ class MassageRepository() {
         return messagesLiveData
     }
 
-    fun setTypingStatus(chatId: String, userId: String, isTyping: Boolean) {
-        val typingStatusRef = firestore.collection("chats")
-            .document(chatId)
-            .collection("typingStatus")
-            .document(userId)
-
-        val status = mapOf(
-            "isTyping" to isTyping,
-            "timestamp" to System.currentTimeMillis()
-        )
-
-        typingStatusRef.set(status)
+    fun updateTypingStatus(currentUserId: String, isTyping: Boolean) {
+        firestore.collection("users").document(currentUserId).update("typing", isTyping)
+            .addOnSuccessListener {
+                Log.d("UserTyping", "Typing status updated to $isTyping")
+            }
+            .addOnFailureListener { e ->
+                Log.e("UserTyping", "Error updating typing status: ${e.message}")
+            }
     }
 
-    fun getTypingStatus(chatId: String): LiveData<Map<String, Boolean>> {
-        val liveData = MutableLiveData<Map<String, Boolean>>()
-        firestore.collection("chats")
-            .document(chatId)
-            .collection("typingStatus")
-            .addSnapshotListener { snapshot, _ ->
-                val typingStatus = snapshot?.documents?.associate { doc ->
-                    doc.id to (doc.getBoolean("isTyping") ?: false)
+    fun getUserTypingStatus(receiverId: String): LiveData<Boolean> {
+        val typingLiveData = MutableLiveData<Boolean>()
+
+        firestore.collection("users").document(receiverId)
+            .addSnapshotListener { snapshot, e ->
+                if (e != null) {
+                    Log.w("UserTyping", "Listen failed.", e)
+                    return@addSnapshotListener
                 }
-                liveData.value = typingStatus!!
+
+                if (snapshot != null && snapshot.exists()) {
+                    val isTyping = snapshot.getBoolean("typing") ?: false
+                    typingLiveData.postValue(isTyping)
+                } else {
+                    typingLiveData.postValue(false)
+                }
             }
-        return liveData
+        return typingLiveData
     }
 }
 
