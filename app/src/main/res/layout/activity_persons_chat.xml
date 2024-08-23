@@ -33,12 +33,25 @@
                 android:id="@+id/profile_image"
                 android:layout_width="50dp"
                 android:layout_height="50dp"
-                android:scaleType="fitXY"
+                android:scaleType="centerCrop"
                 android:src="@drawable/gt"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
                 app:shapeAppearanceOverlay="@style/CircleImage" />
+
+            <androidx.cardview.widget.CardView
+                android:id="@+id/onlineIndicator"
+                android:layout_width="10dp"
+                android:layout_height="10dp"
+                android:layout_marginStart="8dp"
+                android:text="offline"
+                app:cardCornerRadius="100dp"
+                android:backgroundTint="#00EC17"
+                android:textColor="@color/md_theme_onSecondary"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toEndOf="@+id/contact_name"
+                app:layout_constraintTop_toTopOf="parent" />
 
             <!-- Contact Name -->
             <TextView
@@ -56,7 +69,7 @@
 
             <!-- Status Message -->
             <TextView
-                android:id="@+id/statusIndicatore"
+                android:id="@+id/typingIndicator"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="8dp"
@@ -76,6 +89,7 @@
         android:layout_height="0dp"
         app:layout_constraintBottom_toTopOf="@+id/layout_gchat_chatbox"
         app:layout_constraintEnd_toEndOf="parent"
+        tools:listitem="@layout/item_message_chat"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/toolbar2" />
 
@@ -98,6 +112,17 @@
         app:layout_constraintBottom_toBottomOf="parent">
 
         <com.google.android.material.button.MaterialButton
+            android:id="@+id/pickImage"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            app:iconGravity="top"
+            app:icon="@drawable/photo_camera"
+            android:layout_marginEnd="8dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/sendText"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <com.google.android.material.button.MaterialButton
             android:id="@+id/emoji"
             android:layout_width="40dp"
             android:layout_height="40dp"
@@ -118,7 +143,7 @@
             android:maxLines="6"
             android:padding="8dp"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@+id/sendText"
+            app:layout_constraintEnd_toStartOf="@+id/pickImage"
             app:layout_constraintStart_toEndOf="@+id/emoji"
             app:layout_constraintTop_toTopOf="parent" />
 

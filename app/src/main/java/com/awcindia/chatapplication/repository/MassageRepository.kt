@@ -4,49 +4,38 @@ import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.awcindia.chatapplication.model.MessageData
+import com.awcindia.chatapplication.model.TypingStatus
 import com.google.firebase.firestore.FirebaseFirestore
-import kotlinx.coroutines.tasks.await
 
-class MassageRepository(val firestore: FirebaseFirestore) {
-    fun receiveMessage(senderRoom: String): LiveData<List<MessageData>> {
+class MassageRepository() {
+    private val firestore = FirebaseFirestore.getInstance()
+
+    fun sendMessage(chatId: String, message: MessageData) {
+        val messageDoc = firestore.collection("chats")
+            .document(chatId)
+            .collection("messages")
+            .document()
+
+        val messageWithId = message.copy(messageId = messageDoc.id)
+        messageDoc.set(messageWithId)
+    }
+
+    fun getMessages(chatId: String): LiveData<List<MessageData>> {
         val messagesLiveData = MutableLiveData<List<MessageData>>()
 
-        firestore.collection("messages")
-            .document(senderRoom)
-            .collection("chats")
+        firestore.collection("chats")
+            .document(chatId)
+            .collection("messages")
             .orderBy("timestamp")
-            .addSnapshotListener { snapshot, e ->
-                if (e != null) {
-                    Log.w("ChatRepository", "Listen failed.", e)
-                    return@addSnapshotListener
+            .addSnapshotListener { snapshot, _ ->
+                val messages = snapshot?.documents?.mapNotNull { document ->
+                    document.toObject(MessageData::class.java)
                 }
-
-                if (snapshot != null && !snapshot.isEmpty) {
-                    val messagesList = snapshot.toObjects(MessageData::class.java)
-                    messagesLiveData.postValue(messagesList)
-                }
+                messagesLiveData.value = messages!!
             }
 
         return messagesLiveData
     }
-
-    suspend fun sendMessage(senderRoom: String, receiverRoom: String, messageData: MessageData) {
-
-        try {
-            // Add message to sender's room
-            firestore.collection("messages").document(senderRoom)
-                .collection("chats").add(messageData).await()
-
-            // Add message to receiver's room
-            firestore.collection("messages").document(receiverRoom)
-                .collection("chats").add(messageData).await()
-
-        } catch (e: Exception) {
-            // Handle the exception
-            Log.e("sendMessage", "Error sending message: ${e.message}")
-        }
-    }
-
 
     fun updateTypingStatus(currentUserId: String, isTyping: Boolean) {
         firestore.collection("users").document(currentUserId).update("typing", isTyping)
@@ -58,8 +47,7 @@ class MassageRepository(val firestore: FirebaseFirestore) {
             }
     }
 
-
-        fun getUserTypingStatus(receiverId: String): LiveData<Boolean> {
+    fun getUserTypingStatus(receiverId: String): LiveData<Boolean> {
         val typingLiveData = MutableLiveData<Boolean>()
 
         firestore.collection("users").document(receiverId)
@@ -78,5 +66,5 @@ class MassageRepository(val firestore: FirebaseFirestore) {
             }
         return typingLiveData
     }
-
 }
+

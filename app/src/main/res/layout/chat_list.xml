@@ -15,7 +15,7 @@
             android:id="@+id/profile_image"
             android:layout_width="48dp"
             android:layout_height="48dp"
-            android:scaleType="fitXY"
+            android:scaleType="centerCrop"
             android:src="@drawable/gt"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -37,31 +37,41 @@
             app:layout_constraintStart_toEndOf="@id/profile_image"
             app:layout_constraintTop_toTopOf="parent" />
 
-        <!-- Last Message Preview -->
-        <TextView
-            android:id="@+id/last_message"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
-            android:ellipsize="end"
-            android:maxLines="1"
-            android:text="Last message preview"
-            android:textSize="14sp"
-            app:layout_constraintEnd_toEndOf="@id/contact_name"
-            app:layout_constraintStart_toStartOf="@id/contact_name"
-            app:layout_constraintTop_toBottomOf="@id/contact_name" />
+<!--        &lt;!&ndash; Last Message Preview &ndash;&gt;-->
+<!--        <TextView-->
+<!--            android:id="@+id/lastMessage"-->
+<!--            android:layout_width="0dp"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:layout_marginStart="8dp"-->
+<!--            android:ellipsize="end"-->
+<!--            android:maxLines="1"-->
+<!--            android:text="Last message preview"-->
+<!--            android:textSize="14sp"-->
+<!--            app:layout_constraintEnd_toEndOf="@id/contact_name"-->
+<!--            app:layout_constraintStart_toStartOf="@id/contact_name"-->
+<!--            app:layout_constraintTop_toBottomOf="@id/contact_name" />-->
 
-        <!-- Timestamp -->
-        <TextView
-            android:id="@+id/timestamp"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:gravity="end"
-            android:text="12:34 PM"
-            android:textSize="12sp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+<!--        &lt;!&ndash; Timestamp &ndash;&gt;-->
+<!--        <TextView-->
+<!--            android:id="@+id/timestamp"-->
+<!--            android:layout_width="wrap_content"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:gravity="end"-->
+<!--            android:text="12:34 PM"-->
+<!--            android:textSize="12sp"-->
+<!--            app:layout_constraintEnd_toEndOf="parent"-->
+<!--            app:layout_constraintTop_toTopOf="parent" />-->
+
+<!--        <TextView-->
+<!--            android:id="@+id/totalMessage"-->
+<!--            android:layout_width="wrap_content"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:text="2"-->
+<!--            android:textSize="12dp"-->
+<!--            app:layout_constraintBottom_toBottomOf="parent"-->
+<!--            app:layout_constraintEnd_toEndOf="parent"-->
+<!--            app:layout_constraintStart_toEndOf="@+id/contact_name"-->
+<!--            app:layout_constraintTop_toBottomOf="@+id/timestamp" />-->
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
