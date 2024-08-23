@@ -2,13 +2,12 @@ package com.awcindia.chatapplication.ui.activity
 
 
 import android.os.Bundle
-import android.text.Editable
-import android.text.TextWatcher
 import android.view.View
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.core.widget.addTextChangedListener
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.awcindia.chatapplication.R
@@ -34,9 +33,6 @@ class MessageChatActivity : AppCompatActivity() {
     private val currentUserId = FirebaseAuth.getInstance().currentUser?.uid.toString()
     private var receiverId: String = ""
 
-    override fun onStart() {
-        super.onStart()
-    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -80,10 +76,9 @@ class MessageChatActivity : AppCompatActivity() {
 // Observe user typing status
         repository.getUserTypingStatus(receiverId).observe(this) { isTyping ->
             // Update status indicator based on typing status
-            val currentStatus = if (isTyping) "Typing..." else "Online"
+            val currentStatus = if (isTyping) "Typing..." else ""
             binding.typingIndicator.text = currentStatus
         }
-
 
 
         binding.sendText.setOnClickListener {
@@ -99,20 +94,23 @@ class MessageChatActivity : AppCompatActivity() {
                     seenByReceiver = false
                 )
                 messageViewModel.sendMessage(chatId, message)
-//                binding.recyclerGchat.scrollToPosition()
+                binding.recyclerGchat.post {
+                    binding.recyclerGchat.scrollToPosition(messageAdapter.itemCount - 1)
+                }
                 binding.editGchatMessage.text?.clear()
+                binding.recyclerGchat.post {
+                    binding.recyclerGchat.scrollToPosition(messageAdapter.itemCount - 1)
+                }
             }
         }
 
-        // Set typing status when user types
-        binding.editGchatMessage.addTextChangedListener(object : TextWatcher {
-            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
-            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-                repository.updateTypingStatus(chatId , true)
-            }
-            override fun afterTextChanged(s: Editable?) {}
-        })
+        // Set typing status on text change
+        binding.editGchatMessage.addTextChangedListener {
+            repository.updateTypingStatus(currentUserId, true)
+
+        }
     }
+
     private fun setupInsets() {
         ViewCompat.setOnApplyWindowInsetsListener(binding.main) { v, insets ->
             val systemBarsInsets = insets.getInsets(WindowInsetsCompat.Type.systemBars())
@@ -133,6 +131,15 @@ class MessageChatActivity : AppCompatActivity() {
         } else {
             "$userId2-$userId1"
         }
+    }
+
+    override fun onStop() {
+        super.onStop()
+        repository.updateTypingStatus(currentUserId , false)
+    }
+    override fun onPause() {
+        super.onPause()
+        repository.updateTypingStatus(currentUserId, false)
     }
 
 }
