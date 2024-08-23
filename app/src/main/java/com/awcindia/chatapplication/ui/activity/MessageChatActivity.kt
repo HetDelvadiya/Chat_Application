@@ -119,7 +119,6 @@ class MessageChatActivity : AppCompatActivity() {
             binding.recyclerGchat.scrollToPosition(messageList.size - 1)
         })
 
-
         binding.sendText.setOnClickListener {
             val messageText = binding.editGchatMessage.text.toString().trim()
             if (messageText.isNotEmpty()) {
