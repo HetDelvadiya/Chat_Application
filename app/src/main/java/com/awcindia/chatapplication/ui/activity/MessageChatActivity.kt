@@ -1,9 +1,13 @@
 package com.awcindia.chatapplication.ui.activity
 
 
+import android.app.Activity
+import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
@@ -28,6 +32,9 @@ class MessageChatActivity : AppCompatActivity() {
     private lateinit var binding: ActivityPersonsChatBinding
     private lateinit var messageViewModel: MessageViewModel
 
+    private lateinit var imageMessageLauncher: ActivityResultLauncher<Intent>
+
+    private var fileUri: String? = null
     private lateinit var chatId: String
     private lateinit var messageAdapter: MessageAdapter
     private val repository = MassageRepository()
@@ -47,19 +54,23 @@ class MessageChatActivity : AppCompatActivity() {
         messageViewModel =
             ViewModelProvider(this, MessageFactory(repository))[MessageViewModel::class.java]
 
-
         receiverId = intent.getStringExtra("userId").orEmpty()
         val userName = intent.getStringExtra("userName")
         val userImage = intent.getStringExtra("userImage")
 
         chatId = generateChatId(currentUserId, receiverId)
 
+
+        retrieveImage()
+        binding.pickImage.setOnClickListener {
+
+            val i = Intent(this, ImageMessageActivity::class.java)
+            imageMessageLauncher.launch(i)
+        }
+
         binding.contactName.text = userName
-        Glide.with(this)
-            .load(userImage)
-            .placeholder(R.drawable.default_dp)
-            .error(R.drawable.default_dp)
-            .into(binding.profileImage)
+        Glide.with(this).load(userImage).placeholder(R.drawable.default_dp)
+            .error(R.drawable.default_dp).into(binding.profileImage)
 
         messageAdapter = MessageAdapter(this, currentUserId)
         binding.recyclerGchat.adapter = messageAdapter
@@ -77,12 +88,11 @@ class MessageChatActivity : AppCompatActivity() {
         }
         // Collect user typing status using coroutine
         lifecycleScope.launch {
-            repository.getUserTypingStatus(receiverId)
-                .collectLatest { isTyping ->
-                    // Update status indicator based on typing status
-                    val currentStatus = if (isTyping) "Typing..." else ""
-                    binding.typingIndicator.text = currentStatus
-                }
+            repository.getUserTypingStatus(receiverId).collectLatest { isTyping ->
+                // Update status indicator based on typing status
+                val currentStatus = if (isTyping) "Typing..." else ""
+                binding.typingIndicator.text = currentStatus
+            }
         }
 
         // Set typing status on text change
@@ -101,7 +111,7 @@ class MessageChatActivity : AppCompatActivity() {
                     receiverId = receiverId,
                     timestamp = System.currentTimeMillis(),
                     messageType = "text",
-                    imageUrl = null,
+                    imageUrl = "",
                     seenByReceiver = false
                 )
                 messageViewModel.sendMessage(chatId, message)
@@ -114,6 +124,8 @@ class MessageChatActivity : AppCompatActivity() {
                 }
             }
         }
+
+
     }
 
     private fun setupInsets() {
@@ -160,4 +172,38 @@ class MessageChatActivity : AppCompatActivity() {
         }
     }
 
+    private fun retrieveImage() {
+        // Initialize ActivityResultLauncher
+        imageMessageLauncher =
+            registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+                if (result.resultCode == Activity.RESULT_OK) {
+                    val imageUri = result.data?.getStringExtra("imageUri")
+                    imageUri?.let {
+                        fileUri = it
+                        sendImageMessage(fileUri)
+                    }
+                }
+            }
+    }
+
+    private fun sendImageMessage(fileUris: String?) {
+
+        val message = MessageData(
+            message = "",
+            senderId = currentUserId,
+            receiverId = receiverId,
+            timestamp = System.currentTimeMillis(),
+            messageType = "image",
+            imageUrl = fileUris.toString(),
+            seenByReceiver = false
+        )
+        messageViewModel.sendMessage(chatId, message)
+        binding.recyclerGchat.post {
+            binding.recyclerGchat.scrollToPosition(messageAdapter.itemCount - 1)
+        }
+        binding.editGchatMessage.text?.clear()
+        binding.recyclerGchat.post {
+            binding.recyclerGchat.scrollToPosition(messageAdapter.itemCount - 1)
+        }
+    }
 }

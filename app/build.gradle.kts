@@ -48,6 +48,8 @@ dependencies {
     implementation("com.google.firebase:firebase-storage")
     implementation ("androidx.browser:browser:1.2.0")
 
+    implementation ("androidx.core:core:1.13.1")
+
     implementation ("com.github.bumptech.glide:glide:4.16.0")
     implementation(libs.androidx.media3.common)
     implementation(libs.play.services.cast.framework)
@@ -59,7 +61,11 @@ dependencies {
     implementation ("androidx.activity:activity-ktx:1.9.1")
     implementation ("androidx.fragment:fragment-ktx:1.8.2")
 
-    
+
+
+
+    implementation ("com.github.dhaval2404:imagepicker:2.1")
+    implementation (libs.imagepicker)
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
