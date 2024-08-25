@@ -1,11 +1,9 @@
 package com.awcindia.chatapplication.ui.viewmodel
 
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.awcindia.chatapplication.model.MessageData
-import com.awcindia.chatapplication.model.TypingStatus
 import com.awcindia.chatapplication.repository.MassageRepository
 import kotlinx.coroutines.launch
 
