@@ -52,6 +52,8 @@ class MessageAdapter(
         fun bind(message: MessageData) {
             when (binding) {
                 is ItemMessageSentBinding -> {
+                    binding.messageText.visibility =
+                        if (message.messageType == "text") View.VISIBLE else View.GONE
                     binding.messageText.text = message.message
                     binding.messageImage.visibility =
                         if (message.messageType == "text") View.GONE else View.VISIBLE
@@ -65,6 +67,8 @@ class MessageAdapter(
                 }
 
                 is ItemMessageReceivedBinding -> {
+                    binding.messageText.visibility =
+                        if (message.messageType == "text") View.VISIBLE else View.GONE
                     binding.messageText.text = message.message
                     binding.messageImage.visibility =
                         if (message.messageType == "text") View.GONE else View.VISIBLE
@@ -86,6 +90,7 @@ class MessageAdapter(
             }
         }
     }
+
     class MessageDiffCallback : DiffUtil.ItemCallback<MessageData>() {
 
         override fun areItemsTheSame(oldItem: MessageData, newItem: MessageData): Boolean {
