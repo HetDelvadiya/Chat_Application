@@ -1,4 +1,4 @@
-package com.awcindia.chatapplication.ui.viewmodel
+package com.awcindia.chatapplication.viewmodel
 
 import android.app.Application
 import android.util.Log
@@ -13,10 +13,9 @@ import kotlinx.coroutines.launch
 
 class CallViewModel(private val application: Application) : ViewModel() {
 
-
     private val callRepository = CallRepository()
-    private val appId: Long = 660355364L
-    private val appSign: String = "b0e5ffedb80419c43a6faf69bc28456e8c95e7ee94d0dccab7c2e2cdd0b57159"
+    private val appId: Long = System.getenv("ZEGOCLOUD_APP_ID")?.toLongOrNull() ?: 0L
+    private val appSign: String = System.getenv("ZEGOCLOUD_APP_SIGN") ?: ""
     private val _receiverPhoneNumber = MutableLiveData<String>()
     val receiverPhoneNumber: LiveData<String> get() = _receiverPhoneNumber
     fun setUpZeGoUIKit(userName : String) {

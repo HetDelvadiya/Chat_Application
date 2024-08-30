@@ -17,7 +17,7 @@ import com.awcindia.chatapplication.databinding.FragmentChatBinding
 import com.awcindia.chatapplication.model.Contact
 import com.awcindia.chatapplication.repository.ContactRepository
 import com.awcindia.chatapplication.ui.adapter.ChatListAdapter
-import com.awcindia.chatapplication.ui.viewmodel.ContactViewModel
+import com.awcindia.chatapplication.viewmodel.ContactViewModel
 import com.awcindia.chatapplication.utils.ContactsManager
 import com.google.firebase.firestore.FirebaseFirestore
 

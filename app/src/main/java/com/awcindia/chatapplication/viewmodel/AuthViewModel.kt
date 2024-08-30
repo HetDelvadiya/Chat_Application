@@ -1,4 +1,4 @@
-package com.awcindia.chatapplication.ui.viewmodel
+package com.awcindia.chatapplication.viewmodel
 
 
 import android.app.Activity

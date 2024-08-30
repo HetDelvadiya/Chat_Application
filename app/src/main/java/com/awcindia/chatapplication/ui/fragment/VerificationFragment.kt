@@ -14,7 +14,7 @@ import com.awcindia.chatapplication.ViewModelFactory.VerificationFactory
 import com.awcindia.chatapplication.databinding.FragmentVerificationBinding
 import com.awcindia.chatapplication.repository.AuthStates
 import com.awcindia.chatapplication.repository.VerificationRepository
-import com.awcindia.chatapplication.ui.viewmodel.VerificationViewModel
+import com.awcindia.chatapplication.viewmodel.VerificationViewModel
 import com.google.firebase.auth.FirebaseAuth
 
 

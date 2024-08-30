@@ -3,7 +3,7 @@ package com.awcindia.chatapplication.ViewModelFactory
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.awcindia.chatapplication.repository.VerificationRepository
-import com.awcindia.chatapplication.ui.viewmodel.VerificationViewModel
+import com.awcindia.chatapplication.viewmodel.VerificationViewModel
 
 @Suppress("UNCHECKED_CAST")
 class VerificationFactory(private val repository: VerificationRepository) : ViewModelProvider.Factory{

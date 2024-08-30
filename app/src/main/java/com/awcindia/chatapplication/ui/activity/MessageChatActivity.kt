@@ -24,8 +24,8 @@ import com.awcindia.chatapplication.databinding.ActivityPersonsChatBinding
 import com.awcindia.chatapplication.model.MessageData
 import com.awcindia.chatapplication.repository.MassageRepository
 import com.awcindia.chatapplication.ui.adapter.MessageAdapter
-import com.awcindia.chatapplication.ui.viewmodel.CallViewModel
-import com.awcindia.chatapplication.ui.viewmodel.MessageViewModel
+import com.awcindia.chatapplication.viewmodel.CallViewModel
+import com.awcindia.chatapplication.viewmodel.MessageViewModel
 import com.bumptech.glide.Glide
 import com.google.firebase.auth.FirebaseAuth
 import com.zegocloud.uikit.service.defines.ZegoUIKitUser
@@ -36,7 +36,6 @@ class MessageChatActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityPersonsChatBinding
     private lateinit var messageViewModel: MessageViewModel
-
     private lateinit var imageMessageLauncher: ActivityResultLauncher<Intent>
     private var fileUri: String? = null
     private lateinit var chatId: String

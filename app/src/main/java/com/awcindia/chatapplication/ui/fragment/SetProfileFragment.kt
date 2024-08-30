@@ -20,8 +20,8 @@ import com.awcindia.chatapplication.R
 import com.awcindia.chatapplication.ViewModelFactory.SetProfileFactory
 import com.awcindia.chatapplication.databinding.FragmentSetProfileBinding
 import com.awcindia.chatapplication.repository.SetProfileRepository
-import com.awcindia.chatapplication.ui.viewmodel.SetProfitViewModel
-import com.awcindia.chatapplication.ui.viewmodel.UploadState
+import com.awcindia.chatapplication.viewmodel.SetProfitViewModel
+import com.awcindia.chatapplication.viewmodel.UploadState
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.storage.FirebaseStorage

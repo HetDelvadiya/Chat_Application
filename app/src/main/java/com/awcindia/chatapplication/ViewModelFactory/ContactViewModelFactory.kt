@@ -3,7 +3,7 @@ package com.awcindia.chatapplication.ViewModelFactory
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.awcindia.chatapplication.repository.ContactRepository
-import com.awcindia.chatapplication.ui.viewmodel.ContactViewModel
+import com.awcindia.chatapplication.viewmodel.ContactViewModel
 
 class ContactViewModelFactory(private val repository: ContactRepository) :
     ViewModelProvider.Factory {
