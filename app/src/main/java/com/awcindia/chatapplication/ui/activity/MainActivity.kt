@@ -1,10 +1,10 @@
 package com.awcindia.chatapplication.ui.activity
 
-import android.content.Intent
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.result.ActivityResultLauncher
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.SearchView
 import androidx.core.view.ViewCompat
@@ -19,6 +19,8 @@ import com.awcindia.chatapplication.ui.fragment.StatusFragment
 class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
+    private lateinit var requestPermissionLauncher: ActivityResultLauncher<Array<String>>
+    var userName: String = ""
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -33,7 +35,8 @@ class MainActivity : AppCompatActivity() {
 
         if (savedInstanceState == null) {
             supportFragmentManager.beginTransaction()
-                .replace(com.awcindia.chatapplication.R.id.fragment_container, ChatFragment()).commit()
+                .replace(com.awcindia.chatapplication.R.id.fragment_container, ChatFragment())
+                .commit()
         }
 
         binding.bottomNavigationView.setOnItemSelectedListener { item ->
@@ -63,7 +66,8 @@ class MainActivity : AppCompatActivity() {
 
     private fun loadFragment(fragment: Fragment) {
 
-        supportFragmentManager.beginTransaction().replace(com.awcindia.chatapplication.R.id.fragment_container, fragment)
+        supportFragmentManager.beginTransaction()
+            .replace(com.awcindia.chatapplication.R.id.fragment_container, fragment)
             .commit()
     }
 

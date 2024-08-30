@@ -55,17 +55,18 @@ dependencies {
     implementation(libs.play.services.cast.framework)
     kapt("com.github.bumptech.glide:compiler:4.15.1")
     implementation ("androidx.paging:paging-runtime:3.3.2")
-    implementation ("androidx.lifecycle:lifecycle-livedata-ktx:2.6.1")
+    implementation ("androidx.lifecycle:lifecycle-livedata-ktx:2.8.4")
     //Coroutines
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3")
     implementation ("androidx.activity:activity-ktx:1.9.1")
     implementation ("androidx.fragment:fragment-ktx:1.8.2")
 
-
-
-
+    implementation ("io.agora.rtc:full-sdk:4.1.0")
     implementation ("com.github.dhaval2404:imagepicker:2.1")
     implementation (libs.imagepicker)
+
+    implementation ("com.github.ZEGOCLOUD:zego_uikit_prebuilt_call_android:+")
+    implementation ("com.google.firebase:firebase-messaging:23.2.0")
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)

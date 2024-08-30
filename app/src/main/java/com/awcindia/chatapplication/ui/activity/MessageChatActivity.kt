@@ -4,6 +4,7 @@ package com.awcindia.chatapplication.ui.activity
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.ActivityResultLauncher
@@ -12,18 +13,22 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.widget.addTextChangedListener
+import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.awcindia.chatapplication.R
+import com.awcindia.chatapplication.ViewModelFactory.CallViewModelFactory
 import com.awcindia.chatapplication.ViewModelFactory.MessageFactory
 import com.awcindia.chatapplication.databinding.ActivityPersonsChatBinding
 import com.awcindia.chatapplication.model.MessageData
 import com.awcindia.chatapplication.repository.MassageRepository
 import com.awcindia.chatapplication.ui.adapter.MessageAdapter
+import com.awcindia.chatapplication.ui.viewmodel.CallViewModel
 import com.awcindia.chatapplication.ui.viewmodel.MessageViewModel
 import com.bumptech.glide.Glide
 import com.google.firebase.auth.FirebaseAuth
+import com.zegocloud.uikit.service.defines.ZegoUIKitUser
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
@@ -33,14 +38,14 @@ class MessageChatActivity : AppCompatActivity() {
     private lateinit var messageViewModel: MessageViewModel
 
     private lateinit var imageMessageLauncher: ActivityResultLauncher<Intent>
-
     private var fileUri: String? = null
     private lateinit var chatId: String
     private lateinit var messageAdapter: MessageAdapter
     private val repository = MassageRepository()
     private val currentUserId = FirebaseAuth.getInstance().currentUser?.uid.toString()
     private var receiverId: String = ""
-
+    private lateinit var callViewModel: CallViewModel
+    var phoneNumber: String? = ""
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -60,7 +65,6 @@ class MessageChatActivity : AppCompatActivity() {
 
         chatId = generateChatId(currentUserId, receiverId)
 
-
         retrieveImage()
         binding.pickImage.setOnClickListener {
 
@@ -76,7 +80,22 @@ class MessageChatActivity : AppCompatActivity() {
         binding.recyclerGchat.adapter = messageAdapter
         binding.recyclerGchat.layoutManager = LinearLayoutManager(this)
 
+        callViewModel =
+            ViewModelProvider(this, CallViewModelFactory(application))[CallViewModel::class.java]
 
+        callViewModel.setUpZeGoUIKit(userName!!)
+        callViewModel.getReceiverPhoneNumber(receiverId)
+
+        callViewModel.receiverPhoneNumber.observe(this, Observer { phone ->
+            if (phone != null) {
+                Log.d("VoiceCallActivity", "Receiver's phone number: $phone")
+                phoneNumber = phone
+                startVideoCall(phoneNumber!!, userName)
+                startVoiceCall(phoneNumber!!, userName)
+            } else {
+                Log.e("VoiceCallActivity", "Receiver's phone number is not available.")
+            }
+        })
 
         messageViewModel.getMessages(chatId).observe(this) { messages ->
             messages?.let {
@@ -206,4 +225,23 @@ class MessageChatActivity : AppCompatActivity() {
             binding.recyclerGchat.scrollToPosition(messageAdapter.itemCount - 1)
         }
     }
+
+    private fun startVideoCall(targetUserId: String, targetUserName: String) {
+
+        binding.videoCall.setIsVideoCall(true)
+        binding.videoCall.resourceID = "zego_call"
+        binding.videoCall.setInvitees(listOf(ZegoUIKitUser(targetUserId, targetUserName)))
+    }
+
+    private fun startVoiceCall(targetUserId: String, targetUserName: String) {
+        binding.voiceCall.setIsVideoCall(false)
+        binding.voiceCall.resourceID = "zego_call"
+        binding.voiceCall.setInvitees(listOf(ZegoUIKitUser(targetUserId, targetUserName)))
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        callViewModel.unInitZeGoUIKit()
+    }
+
 }

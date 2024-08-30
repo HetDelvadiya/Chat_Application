@@ -31,6 +31,9 @@ class SetProfileFragment : Fragment() {
 
     private lateinit var binding: FragmentSetProfileBinding
 
+    var userName : String = ""
+    private var userId = FirebaseAuth.getInstance().currentUser?.uid
+
     private lateinit var viewModel: SetProfitViewModel
     private var imageUri: Uri? = null
 
@@ -58,7 +61,7 @@ class SetProfileFragment : Fragment() {
         }
 
         binding.save.setOnClickListener {
-            val userName = binding.userName.text.toString()
+           userName = binding.userName.text.toString()
             viewModel.saveUserProfile(userName, imageUri)
         }
 
