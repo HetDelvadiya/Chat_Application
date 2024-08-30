@@ -6,6 +6,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.awcindia.chatapplication.BuildConfig
 import com.awcindia.chatapplication.repository.CallRepository
 import com.zegocloud.uikit.prebuilt.call.ZegoUIKitPrebuiltCallService
 import com.zegocloud.uikit.prebuilt.call.invite.ZegoUIKitPrebuiltCallInvitationConfig
@@ -14,11 +15,12 @@ import kotlinx.coroutines.launch
 class CallViewModel(private val application: Application) : ViewModel() {
 
     private val callRepository = CallRepository()
-    private val appId: Long = System.getenv("ZEGOCLOUD_APP_ID")?.toLongOrNull() ?: 0L
-    private val appSign: String = System.getenv("ZEGOCLOUD_APP_SIGN") ?: ""
+    private val appId: Long = BuildConfig.ZEGOCLOUD_APP_ID
+    private val appSign: String = BuildConfig.ZEGOCLOUD_APP_SIGN
+
     private val _receiverPhoneNumber = MutableLiveData<String>()
     val receiverPhoneNumber: LiveData<String> get() = _receiverPhoneNumber
-    fun setUpZeGoUIKit(userName : String) {
+    fun setUpZeGoUIKit(userName: String) {
 
         viewModelScope.launch {
             val phoneNumber = callRepository.getCurrentUserPhoneNumber()
@@ -38,6 +40,7 @@ class CallViewModel(private val application: Application) : ViewModel() {
             }
         }
     }
+
     fun getReceiverPhoneNumber(receiverId: String) {
         viewModelScope.launch {
             val phoneNumber = callRepository.getReceiverPhoneNumber(receiverId)

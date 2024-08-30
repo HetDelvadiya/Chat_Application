@@ -1,3 +1,5 @@
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.jetbrains.kotlin.android)
@@ -17,11 +19,29 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+
+        // Load local properties
+        val localProperties = Properties()
+        localProperties.load(project.rootProject.file("local.properties").inputStream())
+
+        // Add BuildConfig fields
+        buildConfigField(
+            "long",
+            "ZEGOCLOUD_APP_ID",
+            localProperties.getProperty("ZEGOCLOUD_APP_ID", "0").toLong().toString()
+        )
+        buildConfigField(
+            "String",
+            "ZEGOCLOUD_APP_SIGN",
+            "\"${localProperties.getProperty("ZEGOCLOUD_APP_SIGN", "")}\""
+        )
     }
 
     buildFeatures {
         viewBinding = true
+        buildConfig = true // Ensure BuildConfig is enabled
     }
+
     buildTypes {
         release {
             isMinifyEnabled = false
@@ -29,26 +49,20 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
-
-            buildConfigField("long", "ZEGOCLOUD_APP_ID", "660355364")
-            buildConfigField(
-                "String",
-                "ZEGOCLOUD_APP_SIGN",
-                "\"b0e5ffedb80419c43a6faf69bc28456e8c95e7ee94d0dccab7c2e2cdd0b57159\""
-            )
         }
     }
+
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_1_8
         targetCompatibility = JavaVersion.VERSION_1_8
     }
+
     kotlinOptions {
         jvmTarget = "1.8"
     }
 }
 
 dependencies {
-
     implementation(platform("com.google.firebase:firebase-bom:33.1.2"))
     implementation("com.google.firebase:firebase-auth")
     implementation("com.google.firebase:firebase-firestore")
@@ -56,14 +70,14 @@ dependencies {
     implementation("androidx.browser:browser:1.2.0")
 
     implementation("androidx.core:core:1.13.1")
-
     implementation("com.github.bumptech.glide:glide:4.16.0")
     implementation(libs.androidx.media3.common)
     implementation(libs.play.services.cast.framework)
     kapt("com.github.bumptech.glide:compiler:4.15.1")
     implementation("androidx.paging:paging-runtime:3.3.2")
     implementation("androidx.lifecycle:lifecycle-livedata-ktx:2.8.4")
-    //Coroutines
+
+    // Coroutines
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3")
     implementation("androidx.activity:activity-ktx:1.9.1")
     implementation("androidx.fragment:fragment-ktx:1.8.2")
@@ -83,6 +97,7 @@ dependencies {
     implementation(libs.androidx.navigation.fragment.ktx)
     implementation(libs.androidx.navigation.ui.ktx)
     implementation(libs.firebase.messaging)
+
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
