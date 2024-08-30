@@ -14,8 +14,8 @@ import com.awcindia.chatapplication.ViewModelFactory.AuthViewModelFactory
 import com.awcindia.chatapplication.databinding.FragmentPhoneNumberBinding
 import com.awcindia.chatapplication.model.UserPhoneNumber
 import com.awcindia.chatapplication.repository.AuthRepository
-import com.awcindia.chatapplication.ui.viewmodel.AuthState
-import com.awcindia.chatapplication.ui.viewmodel.AuthViewModel
+import com.awcindia.chatapplication.viewmodel.AuthState
+import com.awcindia.chatapplication.viewmodel.AuthViewModel
 import com.google.firebase.auth.FirebaseAuth
 
 class PhoneNumberFragment : Fragment() {

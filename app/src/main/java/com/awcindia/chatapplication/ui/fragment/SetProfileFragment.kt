@@ -20,8 +20,8 @@ import com.awcindia.chatapplication.R
 import com.awcindia.chatapplication.ViewModelFactory.SetProfileFactory
 import com.awcindia.chatapplication.databinding.FragmentSetProfileBinding
 import com.awcindia.chatapplication.repository.SetProfileRepository
-import com.awcindia.chatapplication.ui.viewmodel.SetProfitViewModel
-import com.awcindia.chatapplication.ui.viewmodel.UploadState
+import com.awcindia.chatapplication.viewmodel.SetProfitViewModel
+import com.awcindia.chatapplication.viewmodel.UploadState
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.storage.FirebaseStorage
@@ -30,6 +30,9 @@ import com.google.firebase.storage.FirebaseStorage
 class SetProfileFragment : Fragment() {
 
     private lateinit var binding: FragmentSetProfileBinding
+
+    var userName : String = ""
+    private var userId = FirebaseAuth.getInstance().currentUser?.uid
 
     private lateinit var viewModel: SetProfitViewModel
     private var imageUri: Uri? = null
@@ -58,7 +61,7 @@ class SetProfileFragment : Fragment() {
         }
 
         binding.save.setOnClickListener {
-            val userName = binding.userName.text.toString()
+           userName = binding.userName.text.toString()
             viewModel.saveUserProfile(userName, imageUri)
         }
 
