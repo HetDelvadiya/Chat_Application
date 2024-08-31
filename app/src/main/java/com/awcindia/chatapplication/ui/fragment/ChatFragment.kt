@@ -9,17 +9,17 @@ import android.view.ViewGroup
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.awcindia.chatapplication.ViewModelFactory.ContactViewModelFactory
 import com.awcindia.chatapplication.databinding.FragmentChatBinding
 import com.awcindia.chatapplication.model.Contact
 import com.awcindia.chatapplication.repository.ContactRepository
-import com.awcindia.chatapplication.ui.adapter.ChatListAdapter
+import com.awcindia.chatapplication.adapter.ChatListAdapter
 import com.awcindia.chatapplication.viewmodel.ContactViewModel
 import com.awcindia.chatapplication.utils.ContactsManager
 import com.google.firebase.firestore.FirebaseFirestore
+import timber.log.Timber
 
 
 class ChatFragment : Fragment() {
@@ -45,12 +45,13 @@ class ChatFragment : Fragment() {
 
             binding.progressbar.visibility = View.VISIBLE
             deviceContact = contactsManager.getContacts()
-            Log.d("list", deviceContact.toString())
+            Timber.d("list: %s", deviceContact.toString())
+
         } else {
             requestContactsPermission()
         }
 
-        Log.d("list", deviceContact.toString())
+        Timber.d("list: %s", deviceContact.toString())
         contactAdapter = ChatListAdapter()
         binding.chatRecyclerview.layoutManager = LinearLayoutManager(requireContext())
         binding.chatRecyclerview.adapter = contactAdapter
@@ -99,6 +100,7 @@ class ChatFragment : Fragment() {
         }
     }
 
+    @Deprecated("Deprecated in Java")
     override fun onRequestPermissionsResult(
         requestCode: Int,
         permissions: Array<out String>,
