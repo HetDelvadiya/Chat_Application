@@ -20,7 +20,8 @@ class CallViewModel(private val application: Application) : ViewModel() {
 
     private val _receiverPhoneNumber = MutableLiveData<String>()
     val receiverPhoneNumber: LiveData<String> get() = _receiverPhoneNumber
-    fun setUpZeGoUIKit(userName: String) {
+
+    fun setUpZeGoUIKit() {
 
         viewModelScope.launch {
             val phoneNumber = callRepository.getCurrentUserPhoneNumber()
@@ -31,7 +32,7 @@ class CallViewModel(private val application: Application) : ViewModel() {
                     appId,
                     appSign,
                     phoneNumber,  // Use phone number as userId
-                    userName,  // Use phone number as userName
+                    phoneNumber,  // Use phone number as userName
                     callInvitationConfig
                 )
             } else {

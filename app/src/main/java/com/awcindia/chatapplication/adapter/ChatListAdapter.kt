@@ -1,4 +1,4 @@
-package com.awcindia.chatapplication.ui.adapter
+package com.awcindia.chatapplication.adapter
 
 import android.content.Intent
 import android.view.LayoutInflater

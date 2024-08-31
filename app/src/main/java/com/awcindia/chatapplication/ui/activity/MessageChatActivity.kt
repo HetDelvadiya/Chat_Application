@@ -20,10 +20,10 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.awcindia.chatapplication.R
 import com.awcindia.chatapplication.ViewModelFactory.CallViewModelFactory
 import com.awcindia.chatapplication.ViewModelFactory.MessageFactory
+import com.awcindia.chatapplication.adapter.MessageAdapter
 import com.awcindia.chatapplication.databinding.ActivityPersonsChatBinding
 import com.awcindia.chatapplication.model.MessageData
 import com.awcindia.chatapplication.repository.MassageRepository
-import com.awcindia.chatapplication.ui.adapter.MessageAdapter
 import com.awcindia.chatapplication.viewmodel.CallViewModel
 import com.awcindia.chatapplication.viewmodel.MessageViewModel
 import com.bumptech.glide.Glide
@@ -82,17 +82,18 @@ class MessageChatActivity : AppCompatActivity() {
         callViewModel =
             ViewModelProvider(this, CallViewModelFactory(application))[CallViewModel::class.java]
 
-        callViewModel.setUpZeGoUIKit(userName!!)
+        callViewModel.setUpZeGoUIKit()
         callViewModel.getReceiverPhoneNumber(receiverId)
 
         callViewModel.receiverPhoneNumber.observe(this, Observer { phone ->
             if (phone != null) {
                 Log.d("VoiceCallActivity", "Receiver's phone number: $phone")
                 phoneNumber = phone
-                startVideoCall(phoneNumber!!, userName)
-                startVoiceCall(phoneNumber!!, userName)
+                startVideoCall(phoneNumber!!, phoneNumber!!)
+                startVoiceCall(phoneNumber!!, phoneNumber!!)
             } else {
                 Log.e("VoiceCallActivity", "Receiver's phone number is not available.")
+
             }
         })
 
