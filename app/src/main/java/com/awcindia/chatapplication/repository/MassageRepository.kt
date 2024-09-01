@@ -1,9 +1,11 @@
 package com.awcindia.chatapplication.repository
 
+import android.content.Context
 import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.awcindia.chatapplication.model.MessageData
+import com.awcindia.chatapplication.model.User
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
@@ -23,7 +25,7 @@ class MassageRepository() {
         messageDoc.set(messageWithId)
     }
 
-    fun getMessages(chatId: String): LiveData<List<MessageData>> {
+    fun getMessages(chatId: String ): LiveData<List<MessageData>> {
         val messagesLiveData = MutableLiveData<List<MessageData>>()
 
         firestore.collection("chats")
@@ -32,9 +34,10 @@ class MassageRepository() {
             .orderBy("timestamp")
             .addSnapshotListener { snapshot, _ ->
                 val messages = snapshot?.documents?.mapNotNull { document ->
-                    document.toObject(MessageData::class.java)
+                    val message = document.toObject(MessageData::class.java)
+                    message
                 }
-                messagesLiveData.value = messages!!
+                messagesLiveData.value = messages ?: emptyList()
             }
 
         return messagesLiveData
@@ -77,5 +80,6 @@ class MassageRepository() {
 
         awaitClose { listenerRegistration.remove() }
     }
+
 }
 

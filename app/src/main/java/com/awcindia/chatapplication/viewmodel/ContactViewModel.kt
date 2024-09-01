@@ -1,14 +1,15 @@
 package com.awcindia.chatapplication.viewmodel
 
 import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
-import com.awcindia.chatapplication.model.Contact
+import androidx.lifecycle.viewModelScope
 import com.awcindia.chatapplication.model.User
 import com.awcindia.chatapplication.repository.ContactRepository
+import kotlinx.coroutines.launch
 
 class ContactViewModel(val repository: ContactRepository) : ViewModel() {
-    fun getAllUser(deviceContacts: List<Contact>): LiveData<List<User>> {
-        return repository.getAllUser(deviceContacts)
+    fun getAllUser(): LiveData<List<User>> {
+        return repository.getAllUser()
     }
 }

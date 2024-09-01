@@ -18,12 +18,17 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.awcindia.chatapplication.R
+import com.awcindia.chatapplication.ViewModelFactory.CallHistoryFactory
 import com.awcindia.chatapplication.ViewModelFactory.CallViewModelFactory
 import com.awcindia.chatapplication.ViewModelFactory.MessageFactory
 import com.awcindia.chatapplication.adapter.MessageAdapter
 import com.awcindia.chatapplication.databinding.ActivityPersonsChatBinding
+import com.awcindia.chatapplication.model.CallHistory
 import com.awcindia.chatapplication.model.MessageData
+import com.awcindia.chatapplication.model.database.CallHistoryDatabase
+import com.awcindia.chatapplication.repository.CallHistoryRepository
 import com.awcindia.chatapplication.repository.MassageRepository
+import com.awcindia.chatapplication.viewmodel.CallHistoryViewModel
 import com.awcindia.chatapplication.viewmodel.CallViewModel
 import com.awcindia.chatapplication.viewmodel.MessageViewModel
 import com.bumptech.glide.Glide
@@ -44,14 +49,15 @@ class MessageChatActivity : AppCompatActivity() {
     private val currentUserId = FirebaseAuth.getInstance().currentUser?.uid.toString()
     private var receiverId: String = ""
     private lateinit var callViewModel: CallViewModel
+    private lateinit var callHistoryViewModel: CallHistoryViewModel
     var phoneNumber: String? = ""
+    var userName: String? = ""
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         binding = ActivityPersonsChatBinding.inflate(layoutInflater)
         setContentView(binding.root)
-
         setupInsets()
 
         binding.progressBar.visibility = View.INVISIBLE
@@ -59,7 +65,7 @@ class MessageChatActivity : AppCompatActivity() {
             ViewModelProvider(this, MessageFactory(repository))[MessageViewModel::class.java]
 
         receiverId = intent.getStringExtra("userId").orEmpty()
-        val userName = intent.getStringExtra("userName")
+        userName = intent.getStringExtra("userName")
         val userImage = intent.getStringExtra("userImage")
 
         chatId = generateChatId(currentUserId, receiverId)
@@ -82,6 +88,14 @@ class MessageChatActivity : AppCompatActivity() {
         callViewModel =
             ViewModelProvider(this, CallViewModelFactory(application))[CallViewModel::class.java]
 
+        val doa = CallHistoryDatabase.getDatabase(this).callDoa()
+        val callHistoryRepository = CallHistoryRepository(doa)
+        callHistoryViewModel =
+            ViewModelProvider(
+                this,
+                CallHistoryFactory(callHistoryRepository)
+            )[CallHistoryViewModel::class.java]
+
         callViewModel.setUpZeGoUIKit()
         callViewModel.getReceiverPhoneNumber(receiverId)
 
@@ -89,13 +103,24 @@ class MessageChatActivity : AppCompatActivity() {
             if (phone != null) {
                 Log.d("VoiceCallActivity", "Receiver's phone number: $phone")
                 phoneNumber = phone
-                startVideoCall(phoneNumber!!, phoneNumber!!)
-                startVoiceCall(phoneNumber!!, phoneNumber!!)
+
+//                startVoiceCall(phoneNumber!!, phoneNumber!!)
+
             } else {
                 Log.e("VoiceCallActivity", "Receiver's phone number is not available.")
 
             }
         })
+
+        binding.videoCall.setOnClickListener(View.OnClickListener {
+            startVideoCall(phoneNumber!!, phoneNumber!!)
+        })
+
+        binding.voiceCall.setOnClickListener(View.OnClickListener {
+            startVoiceCall(phoneNumber!!, phoneNumber!!)
+        })
+
+
 
         messageViewModel.getMessages(chatId).observe(this) { messages ->
             messages?.let {
@@ -143,8 +168,6 @@ class MessageChatActivity : AppCompatActivity() {
                 }
             }
         }
-
-
     }
 
     private fun setupInsets() {
@@ -231,17 +254,30 @@ class MessageChatActivity : AppCompatActivity() {
         binding.videoCall.setIsVideoCall(true)
         binding.videoCall.resourceID = "zego_call"
         binding.videoCall.setInvitees(listOf(ZegoUIKitUser(targetUserId, targetUserName)))
+        saveCallHistory(currentUserId, targetUserId, "video")
     }
 
     private fun startVoiceCall(targetUserId: String, targetUserName: String) {
         binding.voiceCall.setIsVideoCall(false)
         binding.voiceCall.resourceID = "zego_call"
         binding.voiceCall.setInvitees(listOf(ZegoUIKitUser(targetUserId, targetUserName)))
+        saveCallHistory(currentUserId, targetUserId, "voice")
+    }
+
+    private fun saveCallHistory(callerId: String, receiverId: String, callType: String) {
+        val callHistory = CallHistory(
+            callerId = callerId,
+            receiverId = receiverId,
+            receiverName = userName!!,
+            callDate = System.currentTimeMillis(),
+            callType = callType,
+            timestamp = System.currentTimeMillis()
+        )
+        callHistoryViewModel.insertCallHistory(callHistory)
     }
 
     override fun onDestroy() {
         super.onDestroy()
         callViewModel.unInitZeGoUIKit()
     }
-
 }
