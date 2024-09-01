@@ -37,6 +37,8 @@ android {
         )
     }
 
+
+
     buildFeatures {
         viewBinding = true
         buildConfig = true // Ensure BuildConfig is enabled
@@ -44,11 +46,13 @@ android {
 
     buildTypes {
         release {
-            isMinifyEnabled = false
+            isMinifyEnabled = true
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+
+            isShrinkResources = true
         }
     }
 
@@ -73,6 +77,7 @@ dependencies {
     implementation("com.github.bumptech.glide:glide:4.16.0")
     implementation(libs.androidx.media3.common)
     implementation(libs.play.services.cast.framework)
+    implementation(libs.androidx.ui.test.android)
     kapt("com.github.bumptech.glide:compiler:4.15.1")
     implementation("androidx.paging:paging-runtime:3.3.2")
     implementation("androidx.lifecycle:lifecycle-livedata-ktx:2.8.4")
@@ -88,6 +93,10 @@ dependencies {
 
     implementation("com.github.ZEGOCLOUD:zego_uikit_prebuilt_call_android:+")
     implementation("com.google.firebase:firebase-messaging:23.2.0")
+
+    implementation ("androidx.room:room-runtime:2.6.1")
+    kapt ("androidx.room:room-compiler:2.6.1") // Use kapt if you're using Kotlin
+    implementation ("androidx.room:room-ktx:2.6.1")
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)

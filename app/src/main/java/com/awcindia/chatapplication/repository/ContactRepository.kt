@@ -1,17 +1,19 @@
 package com.awcindia.chatapplication.repository
 
+import android.content.Context
 import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import com.awcindia.chatapplication.model.Contact
 import com.awcindia.chatapplication.model.User
+import com.awcindia.chatapplication.utils.ContactsManager
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.QueryDocumentSnapshot
 
-class ContactRepository(private val firestore: FirebaseFirestore) {
+class ContactRepository(private val firestore: FirebaseFirestore, private val context: Context) {
 
     private val contactLiveData = MutableLiveData<List<User>>()
-    fun getAllUser(deviceContacts: List<Contact>): LiveData<List<User>> {
+    fun getAllUser(): LiveData<List<User>> {
+        val deviceContacts = ContactsManager(context).getContacts()
         val matchedContacts = mutableListOf<User>()
 
         if (deviceContacts.isNotEmpty()) {
